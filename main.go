@@ -5,14 +5,35 @@ import (
 	"net/http"
 )
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
+func homeHandler(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprint(w, "<h1>Welcome to my fantastic site!</h1>")
 }
 
-func contactHandler(w http.ResponseWriter, r *http.Request) {
+func contactHandler(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprint(w, "<h1>Contact Page</h1><p>To get in touch, email me at <a href=\"mailto:redvant@outlook.com\">redvant@outlook.com</a>.")
+}
+
+func faqHandler(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, `<h1>FAQ page</h1>
+	<ul>
+		<li>
+			<p style="font-weight: bold;">Is there a free version</p>
+			Yes! We offer a free trial for 30 days on any paid plans.
+		</li>
+		<li>
+			<p style="font-weight: bold;">What are your support hours?</p>
+			We have support staff answering emails 24/7, though response
+			times may be a bit slower on weekends.
+		</li>
+		<li>
+			<p style="font-weight: bold;">How do I contact support?</p>
+			Email us - <a href="mailto:support@lenslocked.com">support@lenslocked.com</a>
+		</li>
+	</ul>
+	`)
 }
 
 type Router struct{}
@@ -23,6 +44,8 @@ func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		homeHandler(w, r)
 	case "/contact":
 		contactHandler(w, r)
+	case "/faq":
+		faqHandler(w, r)
 	default:
 		http.Error(w, "Page not found", http.StatusNotFound)
 	}
