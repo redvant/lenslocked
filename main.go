@@ -7,17 +7,18 @@ import (
 
 func homeHandler(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "<h1>Welcome to my fantastic site!</h1>")
+	fmt.Fprint(w, "<body style=\"font-family: courier, monospace;\"><h1>Welcome to my fantastic site!</h1></body>")
 }
 
 func contactHandler(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "<h1>Contact Page</h1><p>To get in touch, email me at <a href=\"mailto:redvant@outlook.com\">redvant@outlook.com</a>.")
+	fmt.Fprint(w, "<body style=\"font-family: courier, monospace;\"><h1>Contact Page</h1><p>To get in touch, email me at <a href=\"mailto:redvant@outlook.com\">redvant@outlook.com</a>.</p></body>")
 }
 
 func faqHandler(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, `<h1>FAQ page</h1>
+	fmt.Fprint(w, `<body style="font-family: courier, monospace;">
+	<h1>FAQ page</h1>
 	<ul>
 		<li>
 			<p style="font-weight: bold;">Is there a free version</p>
@@ -33,6 +34,7 @@ func faqHandler(w http.ResponseWriter, _ *http.Request) {
 			Email us - <a href="mailto:support@lenslocked.com">support@lenslocked.com</a>
 		</li>
 	</ul>
+	</body>
 	`)
 }
 
