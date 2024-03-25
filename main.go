@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/redvant/lenslocked/middleware"
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,10 +45,16 @@ func faqHandler(w http.ResponseWriter, _ *http.Request) {
 }
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /", homeHandler)
-	mux.HandleFunc("GET /contact", contactHandler)
-	mux.HandleFunc("GET /faq", faqHandler)
+	router := http.NewServeMux()
+	router.HandleFunc("GET /", homeHandler)
+	router.HandleFunc("GET /contact", contactHandler)
+	router.HandleFunc("GET /faq", faqHandler)
+
+	server := http.Server{
+		Addr:    ":3000",
+		Handler: middleware.Logging(router),
+	}
+
 	fmt.Println("Starting the server on :3000...")
-	http.ListenAndServe(":3000", mux)
+	server.ListenAndServe()
 }
