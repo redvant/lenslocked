@@ -5,7 +5,11 @@ import (
 	"net/http"
 )
 
-func homeHandler(w http.ResponseWriter, _ *http.Request) {
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.Error(w, "Page not found", http.StatusNotFound)
+		return
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprint(w, "<body style=\"font-family: courier, monospace;\"><h1>Welcome to my fantastic site!</h1></body>")
 }
