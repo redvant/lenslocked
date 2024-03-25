@@ -38,23 +38,11 @@ func faqHandler(w http.ResponseWriter, _ *http.Request) {
 	`)
 }
 
-type Router struct{}
-
-func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.URL.Path {
-	case "/":
-		homeHandler(w, r)
-	case "/contact":
-		contactHandler(w, r)
-	case "/faq":
-		faqHandler(w, r)
-	default:
-		http.Error(w, "Page not found", http.StatusNotFound)
-	}
-}
-
 func main() {
-	var router Router
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /", homeHandler)
+	mux.HandleFunc("GET /contact", contactHandler)
+	mux.HandleFunc("GET /faq", faqHandler)
 	fmt.Println("Starting the server on :3000...")
-	http.ListenAndServe(":3000", router)
+	http.ListenAndServe(":3000", mux)
 }
