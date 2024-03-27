@@ -2,28 +2,22 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
 
 	"github.com/redvant/lenslocked/middleware"
+	"github.com/redvant/lenslocked/views"
 )
 
-func executeTemplate(w http.ResponseWriter, filepath string) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	t, err := template.ParseFiles(filepath)
+func executeTemplate(w http.ResponseWriter, filepath string, data interface{}) {
+	t, err := views.Parse(filepath)
 	if err != nil {
 		log.Printf("parsing template: %v", err)
 		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
 		return
 	}
-	err = t.Execute(w, nil)
-	if err != nil {
-		log.Printf("executing template: %v", err)
-		http.Error(w, "There was an error executing the template.", http.StatusInternalServerError)
-		return
-	}
+	t.Execute(w, data)
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -32,17 +26,17 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tplPath := filepath.Join("templates", "home.gohtml")
-	executeTemplate(w, tplPath)
+	executeTemplate(w, tplPath, nil)
 }
 
 func contactHandler(w http.ResponseWriter, _ *http.Request) {
 	tplPath := filepath.Join("templates", "contact.gohtml")
-	executeTemplate(w, tplPath)
+	executeTemplate(w, tplPath, nil)
 }
 
 func faqHandler(w http.ResponseWriter, _ *http.Request) {
 	tplPath := filepath.Join("templates", "faq.gohtml")
-	executeTemplate(w, tplPath)
+	executeTemplate(w, tplPath, nil)
 }
 
 func main() {
