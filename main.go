@@ -13,33 +13,21 @@ import (
 func main() {
 	router := http.NewServeMux()
 
-	tpl, err := views.Parse(filepath.Join("templates", "home.gohtml"))
-	if err != nil {
-		panic(err)
-	}
-
+	tplHome := views.Must(views.Parse(filepath.Join("templates", "home.gohtml")))
 	// Add notFound check to StaticHandler for "/"
-	router.HandleFunc("GET /", func(next http.HandlerFunc) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path != "/" {
-				http.NotFound(w, r)
-				return
-			}
-			next.ServeHTTP(w, r)
+	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
 		}
-	}(controllers.StaticHandler(tpl)))
+		controllers.StaticHandler(tplHome).ServeHTTP(w, r)
+	})
 
-	tpl, err = views.Parse(filepath.Join("templates", "contact.gohtml"))
-	if err != nil {
-		panic(err)
-	}
-	router.HandleFunc("GET /contact", controllers.StaticHandler(tpl))
+	router.HandleFunc("GET /contact", controllers.StaticHandler(
+		views.Must(views.Parse(filepath.Join("templates", "contact.gohtml")))))
 
-	tpl, err = views.Parse(filepath.Join("templates", "faq.gohtml"))
-	if err != nil {
-		panic(err)
-	}
-	router.HandleFunc("GET /faq", controllers.StaticHandler(tpl))
+	router.HandleFunc("GET /faq", controllers.StaticHandler(
+		views.Must(views.Parse(filepath.Join("templates", "faq.gohtml")))))
 
 	server := http.Server{
 		Addr:    ":3000",
