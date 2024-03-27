@@ -41,26 +41,8 @@ func contactHandler(w http.ResponseWriter, _ *http.Request) {
 }
 
 func faqHandler(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, `<body style="font-family: courier, monospace;">
-	<h1>FAQ page</h1>
-	<ul>
-		<li>
-			<p style="font-weight: bold;">Is there a free version</p>
-			Yes! We offer a free trial for 30 days on any paid plans.
-		</li>
-		<li>
-			<p style="font-weight: bold;">What are your support hours?</p>
-			We have support staff answering emails 24/7, though response
-			times may be a bit slower on weekends.
-		</li>
-		<li>
-			<p style="font-weight: bold;">How do I contact support?</p>
-			Email us - <a href="mailto:support@lenslocked.com">support@lenslocked.com</a>
-		</li>
-	</ul>
-	</body>
-	`)
+	tplPath := filepath.Join("templates", "faq.gohtml")
+	executeTemplate(w, tplPath)
 }
 
 func main() {
