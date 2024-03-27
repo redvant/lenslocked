@@ -9,13 +9,15 @@ func main() {
 	t := template.Must(template.ParseFiles("hello.gohtml"))
 
 	user := struct {
-		Name string
-		Bio  string
-		Age  int
+		Name    string
+		Bio     string
+		Age     int
+		IsAdmin bool
 	}{
-		Name: "Roman",
-		Bio:  `<script>alert("Haha, you have been h4x0r3d!");</script>`,
-		Age:  123,
+		Name:    "Roman",
+		Bio:     `<script>alert("Haha, you have been h4x0r3d!");</script>`,
+		Age:     30,
+		IsAdmin: false,
 	}
 
 	err := t.Execute(os.Stdout, user)

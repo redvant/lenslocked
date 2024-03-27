@@ -1,5 +1,6 @@
 <h1>Hello, {{.Name}}</h1>
 <p>Bio: {{.Bio}}</p>
+{{if .IsAdmin}}<p>You are an admin</p>{{else}}<p>You are a regular user</p>{{end}}
 
 <script>
 const user = {
