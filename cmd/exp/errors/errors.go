@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
 )
 
 func Connect() error {
@@ -31,12 +30,32 @@ func CreateOrg() error {
 }
 
 func main() {
-	err := CreateUser()
-	if err != nil {
-		log.Println(err)
+	// err := CreateUser()
+	// if err != nil {
+	// log.Println(err)
+	// }
+	// err = CreateOrg()
+	// if err != nil {
+	// log.Println(err)
+	// }
+
+	err := B()
+	// TODO: Determine if the err variable is an 'ErrNotFound'
+	if errors.Is(err, ErrNotFound) {
+		fmt.Println("Error match")
 	}
-	err = CreateOrg()
+}
+
+var ErrNotFound = errors.New("not found")
+
+func A() error {
+	return ErrNotFound
+}
+
+func B() error {
+	err := A()
 	if err != nil {
-		log.Println(err)
+		return fmt.Errorf("b: %w", err)
 	}
+	return nil
 }
