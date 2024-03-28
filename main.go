@@ -26,7 +26,7 @@ func main() {
 	router.HandleFunc("GET /contact", controllers.StaticHandler(
 		views.Must(views.ParseFS(templates.FS, "contact.gohtml"))))
 
-	router.HandleFunc("GET /faq", controllers.StaticHandler(
+	router.HandleFunc("GET /faq", controllers.FAQ(
 		views.Must(views.ParseFS(templates.FS, "faq.gohtml"))))
 
 	server := http.Server{

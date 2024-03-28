@@ -2,10 +2,10 @@ package views
 
 import (
 	"fmt"
+	"html/template"
 	"io/fs"
 	"log"
 	"net/http"
-	"text/template"
 )
 
 func Must(t Template, err error) Template {
