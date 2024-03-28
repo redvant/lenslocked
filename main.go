@@ -3,17 +3,17 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"path/filepath"
 
 	"github.com/redvant/lenslocked/controllers"
 	"github.com/redvant/lenslocked/middleware"
+	"github.com/redvant/lenslocked/templates"
 	"github.com/redvant/lenslocked/views"
 )
 
 func main() {
 	router := http.NewServeMux()
 
-	tplHome := views.Must(views.Parse(filepath.Join("templates", "home.gohtml")))
+	tplHome := views.Must(views.ParseFS(templates.FS, "home.gohtml"))
 	// Add notFound check to StaticHandler for "/"
 	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
@@ -24,10 +24,10 @@ func main() {
 	})
 
 	router.HandleFunc("GET /contact", controllers.StaticHandler(
-		views.Must(views.Parse(filepath.Join("templates", "contact.gohtml")))))
+		views.Must(views.ParseFS(templates.FS, "contact.gohtml"))))
 
 	router.HandleFunc("GET /faq", controllers.StaticHandler(
-		views.Must(views.Parse(filepath.Join("templates", "faq.gohtml")))))
+		views.Must(views.ParseFS(templates.FS, "faq.gohtml"))))
 
 	server := http.Server{
 		Addr:    ":3000",
