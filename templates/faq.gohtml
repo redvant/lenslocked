@@ -1,9 +1,9 @@
-<body style="font-family: courier, monospace;">
+{{define "page"}}
 	<h1>FAQ page</h1>
 	<ul>{{range .}}
 		{{template "qa" .}}
 	{{end}}</ul>
-</body>
+{{end}}
 
 {{define "qa"}}
 		<li>

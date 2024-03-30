@@ -13,7 +13,7 @@ import (
 func main() {
 	router := http.NewServeMux()
 
-	tplHome := views.Must(views.ParseFS(templates.FS, "home.gohtml"))
+	tplHome := views.Must(views.ParseFS(templates.FS, "layout-page.gohtml", "home.gohtml"))
 	// Add notFound check to StaticHandler for "/"
 	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
@@ -24,10 +24,10 @@ func main() {
 	})
 
 	router.HandleFunc("GET /contact", controllers.StaticHandler(
-		views.Must(views.ParseFS(templates.FS, "contact.gohtml"))))
+		views.Must(views.ParseFS(templates.FS, "layout-page.gohtml", "contact.gohtml"))))
 
 	router.HandleFunc("GET /faq", controllers.FAQ(
-		views.Must(views.ParseFS(templates.FS, "faq.gohtml"))))
+		views.Must(views.ParseFS(templates.FS, "layout-page.gohtml", "faq.gohtml"))))
 
 	server := http.Server{
 		Addr:    ":3000",
