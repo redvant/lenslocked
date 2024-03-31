@@ -29,6 +29,9 @@ func main() {
 	router.HandleFunc("GET /faq", controllers.FAQ(
 		views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "faq.gohtml"))))
 
+	router.HandleFunc("GET /signup", controllers.StaticHandler(
+		views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "signup.gohtml"))))
+
 	server := http.Server{
 		Addr:    ":3000",
 		Handler: middleware.Logging(router),
