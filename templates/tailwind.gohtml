@@ -9,6 +9,7 @@
 <body>
   {{template "navbar"}}
   {{template "page" .}}
+  {{template "footer"}}
 </body>
 </html>
 
@@ -29,4 +30,17 @@
             </div>
         </nav>
     </header>
+{{end}}
+
+{{define "footer"}}
+    <footer class="bg-slate-50 mt-10">
+        <div class="px-8 py-1 flex justify-center gap-20">
+            <div>© 2024 Edgar Roman Cervantes.</div>
+            <div>
+                <a class="hover:text-zinc-700" href="https://github.com/redvant">
+                    <i class="fa-brands fa-github"></i> github.com/redvant
+                </a>
+            </div>
+        </div>
+    </footer>
 {{end}}
