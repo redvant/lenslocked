@@ -29,8 +29,11 @@ func main() {
 	router.HandleFunc("GET /faq", controllers.FAQ(
 		views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "faq.gohtml"))))
 
-	router.HandleFunc("GET /signup", controllers.StaticHandler(
-		views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "signup.gohtml"))))
+	usersC := controllers.Users{}
+	usersC.Templates.New = views.Must(views.ParseFS(
+		templates.FS, "tailwind.gohtml", "signup.gohtml",
+	))
+	router.HandleFunc("GET /signup", usersC.New)
 
 	server := http.Server{
 		Addr:    ":3000",
