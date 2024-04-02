@@ -34,6 +34,7 @@ func main() {
 		templates.FS, "tailwind.gohtml", "signup.gohtml",
 	))
 	router.HandleFunc("GET /signup", usersC.New)
+	router.HandleFunc("POST /users", usersC.Create)
 
 	server := http.Server{
 		Addr:    ":3000",
