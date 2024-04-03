@@ -6,8 +6,8 @@ services:
       POSTGRES_USER: baloo
       POSTGRES_PASSWORD: junglebook
       POSTGRES_DB: lenslocked
-    expose:
-      - 5432
+    ports:
+      - 5432:5432
 
   adminer:
     image: adminer
