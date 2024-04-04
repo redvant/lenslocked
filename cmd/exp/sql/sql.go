@@ -93,6 +93,7 @@ func main() {
 	}
 	fmt.Printf("User %d - Name:%q Email:%q\n", id, name, email)
 
+	/* Insert orders
 	userID := 1
 	for i := 1; i <= 5; i++ {
 		amount := i * 100
@@ -106,4 +107,39 @@ func main() {
 		}
 	}
 	fmt.Println("Created orders.")
+	*/
+
+	type Order struct {
+		ID          int
+		UserID      int
+		Amount      string
+		Description string
+	}
+	var orders []Order
+	userID := 1
+	rows, err := db.Query(`
+		SELECT id, amount, description
+		FROM orders
+		WHERE user_id = $1;
+	`, userID)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var order Order
+		order.UserID = userID
+		err := rows.Scan(&order.ID, &order.Amount, &order.Description)
+		if err != nil {
+			panic(err)
+		}
+		orders = append(orders, order)
+	}
+	err = rows.Err()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Orders: %+v\n", orders)
 }
