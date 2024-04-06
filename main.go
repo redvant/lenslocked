@@ -52,6 +52,7 @@ func main() {
 	router.HandleFunc("GET /signup", usersC.New)
 	router.HandleFunc("POST /users", usersC.Create)
 	router.HandleFunc("GET /signin", usersC.SignIn)
+	router.HandleFunc("POST /signin", usersC.Authenticate)
 
 	server := http.Server{
 		Addr:    ":3000",
