@@ -46,8 +46,12 @@ func main() {
 	usersC.Templates.New = views.Must(views.ParseFS(
 		templates.FS, "tailwind.gohtml", "signup.gohtml",
 	))
+	usersC.Templates.SignIn = views.Must(views.ParseFS(
+		templates.FS, "tailwind.gohtml", "signin.gohtml",
+	))
 	router.HandleFunc("GET /signup", usersC.New)
 	router.HandleFunc("POST /users", usersC.Create)
+	router.HandleFunc("GET /signin", usersC.SignIn)
 
 	server := http.Server{
 		Addr:    ":3000",
