@@ -21,8 +21,8 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 	t := template.New(patterns[0])
 	t = t.Funcs(
 		template.FuncMap{
-			"csrfField": func() template.HTML {
-				return `<!-- TODO: Implement the csrfField -->`
+			"csrfField": func() (template.HTML, error) {
+				return "", fmt.Errorf("csrfField not implemented")
 			},
 		},
 	)
