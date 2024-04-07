@@ -16,13 +16,22 @@ func Must(t Template, err error) Template {
 }
 
 func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
-	t, err := template.ParseFS(fs, patterns...)
+	t := template.New(patterns[0])
+	t = t.Funcs(
+		template.FuncMap{
+			"csrfField": func() template.HTML {
+				return `<input type="hidden" />`
+			},
+		},
+	)
+	t, err := t.ParseFS(fs, patterns...)
 	if err != nil {
 		return Template{}, fmt.Errorf("parsing template: %w", err)
 	}
 	return Template{htmlTpl: t}, nil
 }
 
+/* not being used anymore
 func Parse(filepath string) (Template, error) {
 	t, err := template.ParseFiles(filepath)
 	if err != nil {
@@ -30,6 +39,7 @@ func Parse(filepath string) (Template, error) {
 	}
 	return Template{htmlTpl: t}, nil
 }
+*/
 
 type Template struct {
 	htmlTpl *template.Template
