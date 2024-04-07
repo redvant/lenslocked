@@ -64,3 +64,12 @@ func (u Users) Authenticate(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &cookie)
 	fmt.Fprintf(w, "User authenticated: %+v", *user)
 }
+
+func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("email")
+	if err != nil {
+		fmt.Fprint(w, "The email cookie could not be read.")
+		return
+	}
+	fmt.Fprintf(w, "Email cookie: %s\n", cookie.Value)
+}
