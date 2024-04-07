@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/csrf"
 	"github.com/redvant/lenslocked/controllers"
 	"github.com/redvant/lenslocked/middleware"
 	"github.com/redvant/lenslocked/models"
@@ -55,9 +56,14 @@ func main() {
 	router.HandleFunc("POST /signin", usersC.Authenticate)
 	router.HandleFunc("GET /users/me", usersC.CurrentUser)
 
+	csrfKey := "qaKGjjr8CPhMUqTjLXU6oJ8PsS45UcgQ"
+	csrfMw := csrf.Protect([]byte(csrfKey),
+		csrf.Secure(false), // TODO: Remove this for PROD
+	)
+
 	server := http.Server{
 		Addr:    ":3000",
-		Handler: middleware.Logging(router),
+		Handler: middleware.Logging(csrfMw(router)),
 	}
 
 	fmt.Println("Starting the server on :3000...")
