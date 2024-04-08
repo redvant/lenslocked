@@ -69,7 +69,8 @@ func (u Users) Authenticate(w http.ResponseWriter, r *http.Request) {
 func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("email")
 	if err != nil {
-		fmt.Fprint(w, "The email cookie could not be read.")
+		fmt.Println("The email cookie could not be read.")
+		http.Redirect(w, r, "/signin", http.StatusSeeOther)
 		return
 	}
 	fmt.Fprintf(w, "Email cookie: %s\n", cookie.Value)
