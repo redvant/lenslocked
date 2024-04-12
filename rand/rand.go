@@ -12,7 +12,7 @@ func Bytes(n int) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("bytes %w", err)
 	}
-	if nRead <= len(b) {
+	if nRead < n {
 		return nil, fmt.Errorf("bytes: didn't read enough random bytes")
 	}
 	return b, nil
