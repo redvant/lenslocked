@@ -49,10 +49,19 @@ func (ss *SessionService) Create(userID int) (*Session, error) {
 		TokenHash: ss.hash(token),
 	}
 	row := ss.DB.QueryRow(`
-		INSERT INTO sessions (user_id, token_hash)
-		VALUES($1, $2) RETURNING id;
+		UPDATE sessions
+		SET token_hash = $2
+		WHERE user_id = $1
+		RETURNING id;
 	`, session.UserID, session.TokenHash)
 	err = row.Scan(&session.ID)
+	if err == sql.ErrNoRows {
+		row = ss.DB.QueryRow(`
+			INSERT INTO sessions (user_id, token_hash)
+			VALUES($1, $2) RETURNING id;
+		`, session.UserID, session.TokenHash)
+		err = row.Scan(&session.ID)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("create: %w", err)
 	}
