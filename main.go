@@ -58,6 +58,7 @@ func main() {
 	router.HandleFunc("POST /users", usersC.Create)
 	router.HandleFunc("GET /signin", usersC.SignIn)
 	router.HandleFunc("POST /signin", usersC.Authenticate)
+	router.HandleFunc("POST /signout", usersC.SignOut)
 	router.HandleFunc("GET /users/me", usersC.CurrentUser)
 
 	csrfKey := "qaKGjjr8CPhMUqTjLXU6oJ8PsS45UcgQ"
