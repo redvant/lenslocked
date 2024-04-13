@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/redvant/lenslocked/controllers"
 	"github.com/redvant/lenslocked/middleware"
+	"github.com/redvant/lenslocked/migrations"
 	"github.com/redvant/lenslocked/models"
 	"github.com/redvant/lenslocked/templates"
 	"github.com/redvant/lenslocked/views"
@@ -38,7 +39,7 @@ func main() {
 	}
 	defer db.Close()
 
-	err = models.Migrate(db, "migrations")
+	err = models.MigrateFS(db, migrations.FS, ".")
 	if err != nil {
 		panic(err)
 	}
