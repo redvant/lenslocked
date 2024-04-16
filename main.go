@@ -66,6 +66,10 @@ func main() {
 	router.HandleFunc("POST /signout", usersC.SignOut)
 	router.HandleFunc("GET /users/me", usersC.CurrentUser)
 
+	usersMw := middleware.Users{
+		SessionService: &sessionService,
+	}
+
 	csrfKey := "qaKGjjr8CPhMUqTjLXU6oJ8PsS45UcgQ"
 	csrfMw := csrf.Protect([]byte(csrfKey),
 		csrf.Secure(false), // TODO: Remove this for PROD
@@ -73,7 +77,7 @@ func main() {
 
 	server := http.Server{
 		Addr:    ":3000",
-		Handler: middleware.Logging(csrfMw(router)),
+		Handler: middleware.Logging(csrfMw(usersMw.SetUser(router))),
 	}
 
 	fmt.Println("Starting the server on :3000...")
