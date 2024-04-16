@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/redvant/lenslocked/context"
+	"github.com/redvant/lenslocked/cookies"
 	"github.com/redvant/lenslocked/models"
 )
 
@@ -41,7 +42,7 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/signin", http.StatusFound)
 		return
 	}
-	setCookie(w, CookieSession, session.Token)
+	cookies.SetCookie(w, cookies.CookieSession, session.Token)
 	http.Redirect(w, r, "/users/me", http.StatusFound)
 }
 
@@ -72,7 +73,7 @@ func (u Users) Authenticate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
 		return
 	}
-	setCookie(w, CookieSession, session.Token)
+	cookies.SetCookie(w, cookies.CookieSession, session.Token)
 	http.Redirect(w, r, "/users/me", http.StatusFound)
 }
 
@@ -83,24 +84,10 @@ func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, "Current user: %s\n", user.Email)
-
-	// token, err := readCookie(r, CookieSession)
-	// if err != nil {
-	// fmt.Println(err)
-	// http.Redirect(w, r, "/signin", http.StatusFound)
-	// return
-	// }
-	// user, err := u.SessionService.User(token)
-	// if err != nil {
-	// fmt.Println(err)
-	// http.Redirect(w, r, "/signin", http.StatusFound)
-	// return
-	// }
-	// fmt.Fprintf(w, "Current user: %s\n", user.Email)
 }
 
 func (u Users) SignOut(w http.ResponseWriter, r *http.Request) {
-	token, err := readCookie(r, CookieSession)
+	token, err := cookies.ReadCookie(r, cookies.CookieSession)
 	if err != nil {
 		fmt.Println(err)
 		http.Redirect(w, r, "/signin", http.StatusFound)
@@ -112,6 +99,6 @@ func (u Users) SignOut(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
 		return
 	}
-	deleteCookie(w, CookieSession)
+	cookies.DeleteCookie(w, cookies.CookieSession)
 	http.Redirect(w, r, "/signin", http.StatusFound)
 }
