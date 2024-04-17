@@ -37,3 +37,13 @@ func FAQ(tpl Template) http.HandlerFunc {
 		tpl.Execute(w, r, questions)
 	}
 }
+
+func Home(tpl Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+		tpl.Execute(w, r, nil)
+	}
+}

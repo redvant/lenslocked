@@ -58,15 +58,8 @@ func main() {
 
 	// Setup router and routes
 	router := http.NewServeMux()
-	tplHome := views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "home.gohtml"))
-	// Add notFound check to StaticHandler for "/"
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
-		controllers.StaticHandler(tplHome).ServeHTTP(w, r)
-	})
+	router.HandleFunc("GET /", controllers.Home(
+		views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "home.gohtml"))))
 	router.HandleFunc("GET /contact", controllers.StaticHandler(
 		views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "contact.gohtml"))))
 	router.HandleFunc("GET /faq", controllers.FAQ(
