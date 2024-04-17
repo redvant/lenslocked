@@ -14,41 +14,37 @@ import (
 )
 
 func main() {
-	router := http.NewServeMux()
-
-	tplHome := views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "home.gohtml"))
-	// Add notFound check to StaticHandler for "/"
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
-		controllers.StaticHandler(tplHome).ServeHTTP(w, r)
-	})
-
-	router.HandleFunc("GET /contact", controllers.StaticHandler(
-		views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "contact.gohtml"))))
-
-	router.HandleFunc("GET /faq", controllers.FAQ(
-		views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "faq.gohtml"))))
-
+	// Setup the database
 	cfg := models.DefaultPostgresConfig()
 	db, err := models.Open(cfg)
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
-
 	err = models.MigrateFS(db, migrations.FS, ".")
 	if err != nil {
 		panic(err)
 	}
+
+	// Setup services
 	userService := models.UserService{
 		DB: db,
 	}
 	sessionService := models.SessionService{
 		DB: db,
 	}
+
+	// Setup middleware
+	usersMw := middleware.Users{
+		SessionService: &sessionService,
+	}
+
+	csrfKey := "qaKGjjr8CPhMUqTjLXU6oJ8PsS45UcgQ"
+	csrfMw := csrf.Protect([]byte(csrfKey),
+		csrf.Secure(false), // TODO: Remove this for PROD
+	)
+
+	// Setup controllers
 	usersC := controllers.Users{
 		UserService:    &userService,
 		SessionService: &sessionService,
@@ -59,6 +55,22 @@ func main() {
 	usersC.Templates.SignIn = views.Must(views.ParseFS(
 		templates.FS, "tailwind.gohtml", "signin.gohtml",
 	))
+
+	// Setup router and routes
+	router := http.NewServeMux()
+	tplHome := views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "home.gohtml"))
+	// Add notFound check to StaticHandler for "/"
+	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+		controllers.StaticHandler(tplHome).ServeHTTP(w, r)
+	})
+	router.HandleFunc("GET /contact", controllers.StaticHandler(
+		views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "contact.gohtml"))))
+	router.HandleFunc("GET /faq", controllers.FAQ(
+		views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "faq.gohtml"))))
 	router.HandleFunc("GET /signup", usersC.New)
 	router.HandleFunc("POST /users", usersC.Create)
 	router.HandleFunc("GET /signin", usersC.SignIn)
@@ -66,20 +78,13 @@ func main() {
 	router.HandleFunc("POST /signout", usersC.SignOut)
 	router.HandleFunc("GET /users/me", usersC.CurrentUser)
 
-	usersMw := middleware.Users{
-		SessionService: &sessionService,
-	}
-
-	csrfKey := "qaKGjjr8CPhMUqTjLXU6oJ8PsS45UcgQ"
-	csrfMw := csrf.Protect([]byte(csrfKey),
-		csrf.Secure(false), // TODO: Remove this for PROD
-	)
-
+	// Setup server
 	server := http.Server{
 		Addr:    ":3000",
 		Handler: middleware.Logging(csrfMw(usersMw.SetUser(router))),
 	}
 
+	// Start server
 	fmt.Println("Starting the server on :3000...")
 	server.ListenAndServe()
 }
