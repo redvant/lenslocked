@@ -77,10 +77,17 @@ func main() {
 	})
 	router.Handle("/users/me/", http.StripPrefix("/users/me", usersMw.RequireUser(userRouter)))
 
+	// Setup general middleware chain stack
+	mwStack := middleware.CreateStack(
+		middleware.Logging,
+		csrfMw,
+		usersMw.SetUser,
+	)
+
 	// Setup server
 	server := http.Server{
 		Addr:    ":3000",
-		Handler: middleware.Logging(csrfMw(usersMw.SetUser(router))),
+		Handler: mwStack(router),
 	}
 
 	// Start server
