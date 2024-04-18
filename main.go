@@ -58,7 +58,7 @@ func main() {
 
 	// Setup router and routes
 	router := http.NewServeMux()
-	router.HandleFunc("GET /", controllers.Home(
+	router.HandleFunc("/", controllers.Home(
 		views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "home.gohtml"))))
 	router.HandleFunc("GET /contact", controllers.StaticHandler(
 		views.Must(views.ParseFS(templates.FS, "tailwind.gohtml", "contact.gohtml"))))
@@ -69,7 +69,13 @@ func main() {
 	router.HandleFunc("GET /signin", usersC.SignIn)
 	router.HandleFunc("POST /signin", usersC.Authenticate)
 	router.HandleFunc("POST /signout", usersC.SignOut)
-	router.HandleFunc("GET /users/me", usersC.CurrentUser)
+
+	userRouter := http.NewServeMux()
+	userRouter.HandleFunc("GET /", usersC.CurrentUser)
+	userRouter.HandleFunc("GET /hello", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Hello")
+	})
+	router.Handle("/users/me/", http.StripPrefix("/users/me", usersMw.RequireUser(userRouter)))
 
 	// Setup server
 	server := http.Server{
