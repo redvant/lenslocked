@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/caarlos0/env/v11 v11.0.0 // indirect
 	github.com/go-mail/mail/v2 v2.3.0 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

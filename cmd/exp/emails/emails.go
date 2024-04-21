@@ -3,17 +3,24 @@ package main
 import (
 	"fmt"
 
+	"github.com/caarlos0/env/v11"
 	"github.com/go-mail/mail/v2"
 )
 
-const (
-	host     = "<host>"
-	port     = 587
-	username = "<username>"
-	password = "<password>"
-)
+type config struct {
+	Host     string `env:"SMTP_HOST,required"`
+	Port     int    `env:"SMTP_PORT" envDefault:"587"`
+	Username string `env:"SMTP_USERNAME,required"`
+	Password string `env:"SMTP_PASSWORD,required"`
+}
 
 func main() {
+	cfg := config{}
+	err := env.Parse(&cfg)
+	if err != nil {
+		panic(err)
+	}
+
 	from := "test@lenslocked.com"
 	to := "jon@calhoun.io"
 	subject := "This is a test email"
@@ -28,8 +35,8 @@ func main() {
 	msg.AddAlternative("text/html", html)
 	// msg.WriteTo(os.Stdout)
 
-	dialer := mail.NewDialer(host, port, username, password)
-	err := dialer.DialAndSend(msg)
+	dialer := mail.NewDialer(cfg.Host, cfg.Port, cfg.Username, cfg.Password)
+	err = dialer.DialAndSend(msg)
 	if err != nil {
 		panic(err)
 	}
