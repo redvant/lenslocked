@@ -1,9 +1,16 @@
 package main
 
 import (
-	"os"
+	"fmt"
 
 	"github.com/go-mail/mail/v2"
+)
+
+const (
+	host     = "<host>"
+	port     = 587
+	username = "<username>"
+	password = "<password>"
 )
 
 func main() {
@@ -19,5 +26,12 @@ func main() {
 	msg.SetHeader("Subject", subject)
 	msg.SetBody("text/plain", plaintext)
 	msg.AddAlternative("text/html", html)
-	msg.WriteTo(os.Stdout)
+	// msg.WriteTo(os.Stdout)
+
+	dialer := mail.NewDialer(host, port, username, password)
+	err := dialer.DialAndSend(msg)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Message sent")
 }
