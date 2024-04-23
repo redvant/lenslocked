@@ -55,6 +55,9 @@ func main() {
 	usersC.Templates.SignIn = views.Must(views.ParseFS(
 		templates.FS, "tailwind.gohtml", "signin.gohtml",
 	))
+	usersC.Templates.ForgotPassword = views.Must(views.ParseFS(
+		templates.FS, "tailwind.gohtml", "forgot-pw.gohtml",
+	))
 
 	// Setup router and routes
 	router := http.NewServeMux()
@@ -69,6 +72,8 @@ func main() {
 	router.HandleFunc("GET /signin", usersC.SignIn)
 	router.HandleFunc("POST /signin", usersC.Authenticate)
 	router.HandleFunc("POST /signout", usersC.SignOut)
+	router.HandleFunc("GET /forgot-pw", usersC.ForgotPassword)
+	router.HandleFunc("POST /forgot-pw", usersC.ProcessForgotPassword)
 
 	userRouter := http.NewServeMux()
 	userRouter.HandleFunc("GET /", usersC.CurrentUser)
