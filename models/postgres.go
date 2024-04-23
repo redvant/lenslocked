@@ -33,12 +33,12 @@ func DefaultPostgresConfig() PostgresConfig {
 }
 
 type PostgresConfig struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-	Database string
-	SSLMode  string
+	Host     string `env:"PSQL_HOST,required"`
+	Port     string `env:"PSQL_PORT" envDefault:"5432"`
+	User     string `env:"POSTGRES_USER,required"`
+	Password string `env:"POSTGRES_PASSWORD,required"`
+	Database string `env:"POSTGRES_DB,required"`
+	SSLMode  string `env:"PSQL_SSLMODE,required"`
 }
 
 func (cfg PostgresConfig) String() string {

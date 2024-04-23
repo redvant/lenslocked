@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/caarlos0/env/v11"
 	"github.com/gorilla/csrf"
 	"github.com/redvant/lenslocked/controllers"
 	"github.com/redvant/lenslocked/middleware"
@@ -13,10 +14,30 @@ import (
 	"github.com/redvant/lenslocked/views"
 )
 
+type config struct {
+	PSQL   models.PostgresConfig
+	SMTP   models.SMTPConfig
+	CSRF   CSRFConfig
+	Server ServerConfig
+}
+type CSRFConfig struct {
+	Key    string `env:"CSRF_KEY,required"`
+	Secure bool   `env:"CSRF_SECURE" envDefault:"true"`
+}
+type ServerConfig struct {
+	Address string `env:"SERVER_ADDRESS" envDefault:":3000"`
+}
+
 func main() {
+	// Parse config from env var
+	cfg := config{}
+	err := env.Parse(&cfg)
+	if err != nil {
+		panic(err)
+	}
+
 	// Setup the database
-	cfg := models.DefaultPostgresConfig()
-	db, err := models.Open(cfg)
+	db, err := models.Open(cfg.PSQL)
 	if err != nil {
 		panic(err)
 	}
@@ -27,27 +48,33 @@ func main() {
 	}
 
 	// Setup services
-	userService := models.UserService{
+	userService := &models.UserService{
 		DB: db,
 	}
-	sessionService := models.SessionService{
+	sessionService := &models.SessionService{
 		DB: db,
 	}
+	pwResetService := &models.PasswordResetService{
+		DB: db,
+	}
+	emailService := models.NewEmailService(cfg.SMTP)
 
 	// Setup middleware
 	usersMw := middleware.Users{
-		SessionService: &sessionService,
+		SessionService: sessionService,
 	}
 
-	csrfKey := "qaKGjjr8CPhMUqTjLXU6oJ8PsS45UcgQ"
-	csrfMw := csrf.Protect([]byte(csrfKey),
-		csrf.Secure(false), // TODO: Remove this for PROD
+	csrfMw := csrf.Protect([]byte(cfg.CSRF.Key),
+		csrf.Secure(cfg.CSRF.Secure),
 	)
 
 	// Setup controllers
 	usersC := controllers.Users{
-		UserService:    &userService,
-		SessionService: &sessionService,
+		UserService:          userService,
+		SessionService:       sessionService,
+		PasswordResetService: pwResetService,
+		EmailService:         emailService,
+		ServerAddress:        cfg.Server.Address,
 	}
 	usersC.Templates.New = views.Must(views.ParseFS(
 		templates.FS, "tailwind.gohtml", "signup.gohtml",
@@ -91,11 +118,14 @@ func main() {
 
 	// Setup server
 	server := http.Server{
-		Addr:    ":3000",
+		Addr:    cfg.Server.Address,
 		Handler: mwStack(router),
 	}
 
 	// Start server
-	fmt.Println("Starting the server on :3000...")
-	server.ListenAndServe()
+	fmt.Printf("Starting the server on %s...\n", cfg.Server.Address)
+	err = server.ListenAndServe()
+	if err != nil {
+		panic(err)
+	}
 }

@@ -21,6 +21,7 @@ type Users struct {
 	SessionService       *models.SessionService
 	PasswordResetService *models.PasswordResetService
 	EmailService         *models.EmailService
+	ServerAddress        string
 }
 
 func (u Users) New(w http.ResponseWriter, r *http.Request) {
@@ -127,7 +128,7 @@ func (u Users) ProcessForgotPassword(w http.ResponseWriter, r *http.Request) {
 	vals := url.Values{
 		"token": {pwReset.Token},
 	}
-	resetURL := "http://localhost:3000/reset-pw?" + vals.Encode()
+	resetURL := "http://" + u.ServerAddress + "/reset-pw?" + vals.Encode()
 	err = u.EmailService.ForgotPassword(data.Email, resetURL)
 	if err != nil {
 		fmt.Println(err)

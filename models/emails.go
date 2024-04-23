@@ -19,10 +19,11 @@ type Email struct {
 }
 
 type SMTPConfig struct {
-	Host     string `env:"SMTP_HOST,required"`
-	Port     int    `env:"SMTP_PORT" envDefault:"587"`
-	Username string `env:"SMTP_USERNAME,required"`
-	Password string `env:"SMTP_PASSWORD,required"`
+	Host          string `env:"SMTP_HOST,required"`
+	Port          int    `env:"SMTP_PORT" envDefault:"587"`
+	Username      string `env:"SMTP_USERNAME,required"`
+	Password      string `env:"SMTP_PASSWORD,required"`
+	DefaultSender string `env:"SMTP_DEFAULT_SENDER"`
 }
 
 type EmailService struct {
@@ -41,6 +42,7 @@ func NewEmailService(config SMTPConfig) *EmailService {
 			config.Username,
 			config.Password,
 		),
+		DefaultSender: config.DefaultSender,
 	}
 	return &es
 }
