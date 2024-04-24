@@ -16,6 +16,7 @@ type Users struct {
 		SignIn         Template
 		ForgotPassword Template
 		CheckYourEmail Template
+		ResetPassword  Template
 	}
 	UserService          *models.UserService
 	SessionService       *models.SessionService
@@ -136,4 +137,40 @@ func (u Users) ProcessForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	u.Templates.CheckYourEmail.Execute(w, r, data)
+}
+
+func (u Users) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	var data struct {
+		Token string
+	}
+	data.Token = r.FormValue("token")
+	u.Templates.ResetPassword.Execute(w, r, data)
+}
+
+func (u Users) ProcessResetPassword(w http.ResponseWriter, r *http.Request) {
+	var data struct {
+		Token    string
+		Password string
+	}
+	data.Token = r.FormValue("token")
+	data.Password = r.FormValue("password")
+	user, err := u.PasswordResetService.Consume(data.Token)
+	if err != nil {
+		fmt.Println(err)
+		// TODO: Distinguish between types of errors.
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+	// TODO: Update user's password.
+
+	// Sign the user in now that their password has been reset.
+	// Any errors from this point should redirect the user to the sign in page.
+	session, err := u.SessionService.Create(user.ID)
+	if err != nil {
+		fmt.Println(err)
+		http.Redirect(w, r, "/signin", http.StatusFound)
+		return
+	}
+	cookies.SetCookie(w, cookies.CookieSession, session.Token)
+	http.Redirect(w, r, "/users/me", http.StatusFound)
 }
