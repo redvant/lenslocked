@@ -88,6 +88,9 @@ func main() {
 	usersC.Templates.CheckYourEmail = views.Must(views.ParseFS(
 		templates.FS, "tailwind.gohtml", "check-your-email.gohtml",
 	))
+	usersC.Templates.ResetPassword = views.Must(views.ParseFS(
+		templates.FS, "tailwind.gohtml", "reset-pw.gohtml",
+	))
 
 	// Setup router and routes
 	router := http.NewServeMux()
@@ -104,6 +107,8 @@ func main() {
 	router.HandleFunc("POST /signout", usersC.SignOut)
 	router.HandleFunc("GET /forgot-pw", usersC.ForgotPassword)
 	router.HandleFunc("POST /forgot-pw", usersC.ProcessForgotPassword)
+	router.HandleFunc("GET /reset-pw", usersC.ResetPassword)
+	router.HandleFunc("POST /reset-pw", usersC.ProcessResetPassword)
 
 	userRouter := http.NewServeMux()
 	userRouter.HandleFunc("GET /", usersC.CurrentUser)
