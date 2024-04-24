@@ -85,6 +85,9 @@ func main() {
 	usersC.Templates.ForgotPassword = views.Must(views.ParseFS(
 		templates.FS, "tailwind.gohtml", "forgot-pw.gohtml",
 	))
+	usersC.Templates.CheckYourEmail = views.Must(views.ParseFS(
+		templates.FS, "tailwind.gohtml", "check-your-email.gohtml",
+	))
 
 	// Setup router and routes
 	router := http.NewServeMux()
