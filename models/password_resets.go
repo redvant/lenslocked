@@ -1,9 +1,14 @@
 package models
 
 import (
+	"crypto/sha256"
 	"database/sql"
+	"encoding/base64"
 	"fmt"
+	"strings"
 	"time"
+
+	"github.com/redvant/lenslocked/rand"
 )
 
 const (
@@ -33,9 +38,60 @@ type PasswordResetService struct {
 }
 
 func (prs *PasswordResetService) Create(email string) (*PasswordReset, error) {
-	return nil, fmt.Errorf("TODO: Implement PasswordResetService.Create")
+	// Verify email for user, retrieve userID
+	email = strings.ToLower(email)
+	var userID int
+	row := prs.DB.QueryRow(`
+		SELECT id
+		FROM users
+		WHERE email = $1;
+	`, email)
+	err := row.Scan(&userID)
+	if err != nil {
+		// TODO: Consider returning specific error when user doesn't exist
+		return nil, fmt.Errorf("create: %w", err)
+	}
+
+	// Build the password Reset
+	bytesPerToken := prs.BytesPerToken
+	if bytesPerToken < MinBytesPerToken {
+		bytesPerToken = MinBytesPerToken
+	}
+	token, err := rand.String(bytesPerToken)
+	if err != nil {
+		return nil, fmt.Errorf("create: %w", err)
+	}
+	duration := prs.Duration
+	if duration == 0 {
+		duration = DefaultResetDuration
+	}
+	pwReset := PasswordReset{
+		UserID:    userID,
+		Token:     token,
+		TokenHash: prs.hash(token),
+		ExpiresAt: time.Now().Add(duration),
+	}
+
+	// Insert or update password reset into DB
+	row = prs.DB.QueryRow(`
+		INSERT INTO password_resets (user_id, token_hash, expires_at)
+		VALUES($1, $2, $3) ON CONFLICT (user_id) DO
+		UPDATE
+		SET token_hash = $2, expires_at = $3
+		RETURNING id;
+	`, pwReset.UserID, pwReset.TokenHash, pwReset.ExpiresAt)
+	err = row.Scan(&pwReset.ID)
+	if err != nil {
+		return nil, fmt.Errorf("create: %w", err)
+	}
+	return &pwReset, nil
 }
 
 func (prs *PasswordResetService) Consume(token string) (*User, error) {
 	return nil, fmt.Errorf("TODO: Implement PasswordResetService.Consume")
+}
+
+func (prs *PasswordResetService) hash(token string) string {
+	tokenHash := sha256.Sum256([]byte(token))
+	return base64.URLEncoding.EncodeToString(tokenHash[:])
 }
