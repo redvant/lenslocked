@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -43,12 +42,7 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 	data.Password = r.FormValue("password")
 	user, err := u.UserService.Create(data.Email, data.Password)
 	if err != nil {
-		if errors.Is(err, models.ErrEmailTaken) {
-			u.Templates.New.Execute(w, r, data, err)
-			return
-		}
-		fmt.Println(err)
-		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
+		u.Templates.New.Execute(w, r, data, err)
 		return
 	}
 	session, err := u.SessionService.Create(user.ID)
