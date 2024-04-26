@@ -6,6 +6,7 @@ require (
 	github.com/caarlos0/env/v11 v11.0.0
 	github.com/go-mail/mail/v2 v2.3.0
 	github.com/gorilla/csrf v1.7.2
+	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/pressly/goose/v3 v3.19.2
 	golang.org/x/crypto v0.22.0
