@@ -11,6 +11,7 @@
   {{template "alert-banner"}}
   {{template "page" .}}
   {{template "footer"}}
+  {{template "scripts"}}
 </body>
 </html>
 
@@ -51,11 +52,11 @@
     {{if errors}}
         <div class="py-4 px-2">
             {{range errors}}
-                <div class="flex bg-red-100 rounded px-2 py-2 text-red-800 mb-2">
+                <div class="closable flex bg-red-100 rounded px-2 py-2 text-red-800 mb-2">
                     <div class="flex-grow">
                         {{.}}
                     </div>
-                    <a href="#">
+                    <a href="#" onclick="closeAlert(event)">
                         <i class="fa-regular fa-circle-xmark fa-xl"></i>
                     </a>
                 </div>
@@ -75,4 +76,13 @@
             </div>
         </div>
     </footer>
+{{end}}
+
+{{define "scripts"}}
+<script>
+    let closeAlert = (event) => {
+        let closable = event.target.closest(".closable");
+        closable.remove();
+    }
+</script>
 {{end}}
