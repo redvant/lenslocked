@@ -52,9 +52,8 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	session, err := u.SessionService.Create(user.ID)
 	if err != nil {
-		fmt.Println(err)
-		// TODO: Long term, show a warning not being able to sign the user in.
-		http.Redirect(w, r, "/signin", http.StatusFound)
+		// TODO: Errors session creation
+		u.Templates.SignIn.Execute(w, r, data, err)
 		return
 	}
 	cookies.SetCookie(w, cookies.CookieSession, session.Token)
@@ -78,14 +77,14 @@ func (u Users) Authenticate(w http.ResponseWriter, r *http.Request) {
 	data.Password = r.FormValue("password")
 	user, err := u.UserService.Authenticate(data.Email, data.Password)
 	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
+		// TODO: Errors authentication
+		u.Templates.SignIn.Execute(w, r, data, err)
 		return
 	}
 	session, err := u.SessionService.Create(user.ID)
 	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
+		// TODO: Errors session creation
+		u.Templates.SignIn.Execute(w, r, data, err)
 		return
 	}
 	cookies.SetCookie(w, cookies.CookieSession, session.Token)
@@ -100,14 +99,14 @@ func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
 func (u Users) SignOut(w http.ResponseWriter, r *http.Request) {
 	token, err := cookies.ReadCookie(r, cookies.CookieSession)
 	if err != nil {
-		fmt.Println(err)
-		http.Redirect(w, r, "/signin", http.StatusFound)
+		// TODO: Errors reading session cookie
+		u.Templates.SignIn.Execute(w, r, nil, err)
 		return
 	}
 	err = u.SessionService.Delete(token)
 	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
+		// TODO: Errors deleting session
+		u.Templates.SignIn.Execute(w, r, nil, err)
 		return
 	}
 	cookies.DeleteCookie(w, cookies.CookieSession)
@@ -128,10 +127,9 @@ func (u Users) ProcessForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 	data.Email = r.FormValue("email")
 	pwReset, err := u.PasswordResetService.Create(data.Email)
-	// TODO: Handle other cases in the future.
 	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		// TODO: Errors password reset creation
+		u.Templates.ForgotPassword.Execute(w, r, data, err)
 		return
 	}
 	vals := url.Values{
@@ -140,8 +138,8 @@ func (u Users) ProcessForgotPassword(w http.ResponseWriter, r *http.Request) {
 	resetURL := "http://" + u.ServerAddress + "/reset-pw?" + vals.Encode()
 	err = u.EmailService.ForgotPassword(data.Email, resetURL)
 	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		// TODO: Errors send forgot password email
+		u.Templates.ForgotPassword.Execute(w, r, data, err)
 		return
 	}
 	u.Templates.CheckYourEmail.Execute(w, r, data)
@@ -164,15 +162,14 @@ func (u Users) ProcessResetPassword(w http.ResponseWriter, r *http.Request) {
 	data.Password = r.FormValue("password")
 	user, err := u.PasswordResetService.Consume(data.Token)
 	if err != nil {
-		fmt.Println(err)
-		// TODO: Distinguish between types of errors.
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		// TODO: Errors consume password reset
+		u.Templates.ResetPassword.Execute(w, r, data, err)
 		return
 	}
 	err = u.UserService.UpdatePassword(user.ID, data.Password)
 	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		// TODO: Errors update password
+		u.Templates.ResetPassword.Execute(w, r, data, err)
 		return
 	}
 
@@ -180,8 +177,8 @@ func (u Users) ProcessResetPassword(w http.ResponseWriter, r *http.Request) {
 	// Any errors from this point should redirect the user to the sign in page.
 	session, err := u.SessionService.Create(user.ID)
 	if err != nil {
-		fmt.Println(err)
-		http.Redirect(w, r, "/signin", http.StatusFound)
+		// TODO: Errors session create
+		u.Templates.SignIn.Execute(w, r, nil, err)
 		return
 	}
 	cookies.SetCookie(w, cookies.CookieSession, session.Token)
