@@ -11,7 +11,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var ErrEmailTaken = errors.New("models: email address is already in use")
+var (
+	ErrEmailTaken    = errors.New("models: email address is already in use")
+	ErrEmailNotFound = errors.New("models: email address not found")
+)
 
 type User struct {
 	ID           int
@@ -64,6 +67,9 @@ func (us *UserService) Authenticate(email, password string) (*User, error) {
 	`, email)
 	err := row.Scan(&user.ID, &user.PasswordHash)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrEmailNotFound
+		}
 		return nil, fmt.Errorf("authenticate: %w", err)
 	}
 

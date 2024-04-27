@@ -78,6 +78,10 @@ func (u Users) Authenticate(w http.ResponseWriter, r *http.Request) {
 	user, err := u.UserService.Authenticate(data.Email, data.Password)
 	if err != nil {
 		// TODO: Errors authentication
+		if errors.Is(err, models.ErrEmailNotFound) {
+			err = errors.Public(err,
+				"An account could not be found with the email address provided.")
+		}
 		u.Templates.SignIn.Execute(w, r, data, err)
 		return
 	}
