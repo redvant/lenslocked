@@ -77,10 +77,11 @@ func (u Users) Authenticate(w http.ResponseWriter, r *http.Request) {
 	data.Password = r.FormValue("password")
 	user, err := u.UserService.Authenticate(data.Email, data.Password)
 	if err != nil {
-		// TODO: Errors authentication
 		if errors.Is(err, models.ErrEmailNotFound) {
 			err = errors.Public(err,
 				"An account could not be found with the email address provided.")
+		} else if errors.Is(err, models.ErrBadPassword) {
+			err = errors.Public(err, "The provided password is incorrect.")
 		}
 		u.Templates.SignIn.Execute(w, r, data, err)
 		return
