@@ -170,7 +170,15 @@ func (u Users) ProcessResetPassword(w http.ResponseWriter, r *http.Request) {
 	data.Password = r.FormValue("password")
 	user, err := u.PasswordResetService.Consume(data.Token)
 	if err != nil {
-		// TODO: Errors consume password reset
+		if errors.Is(err, models.ErrInvalidPwResetToken) {
+			err = errors.Public(err,
+				`The provided password reset token is invalid.
+				Please try generating a new token through the "Forgot your password?" page.`)
+		} else if errors.Is(err, models.ErrExpiredPwResetToken) {
+			err = errors.Public(err,
+				`The provided password reset token has expired.
+				Please try generating a new token through the "Forgot your password?" page.`)
+		}
 		u.Templates.ResetPassword.Execute(w, r, data, err)
 		return
 	}

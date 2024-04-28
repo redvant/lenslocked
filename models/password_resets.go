@@ -16,6 +16,11 @@ const (
 	DefaultResetDuration = 1 * time.Hour
 )
 
+var (
+	ErrInvalidPwResetToken = errors.New("models: Invalid password reset token")
+	ErrExpiredPwResetToken = errors.New("models: Expired password reset token")
+)
+
 type PasswordReset struct {
 	ID     int
 	UserID int
@@ -104,6 +109,9 @@ func (prs *PasswordResetService) Consume(token string) (*User, error) {
 	err := row.Scan(&user.ID, &user.Email, &user.PasswordHash,
 		&pwReset.ID, &pwReset.ExpiresAt)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrInvalidPwResetToken
+		}
 		return nil, fmt.Errorf("consume: %w", err)
 	}
 
@@ -115,7 +123,7 @@ func (prs *PasswordResetService) Consume(token string) (*User, error) {
 
 	// Check password token expiration
 	if time.Now().After(pwReset.ExpiresAt) {
-		return nil, fmt.Errorf("token expired: %v", token)
+		return nil, ErrExpiredPwResetToken
 	}
 	return &user, nil
 }
