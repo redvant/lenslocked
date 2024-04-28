@@ -52,7 +52,6 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	session, err := u.SessionService.Create(user.ID)
 	if err != nil {
-		// TODO: Errors session creation
 		u.Templates.SignIn.Execute(w, r, data, err)
 		return
 	}
@@ -88,7 +87,6 @@ func (u Users) Authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 	session, err := u.SessionService.Create(user.ID)
 	if err != nil {
-		// TODO: Errors session creation
 		u.Templates.SignIn.Execute(w, r, data, err)
 		return
 	}
@@ -104,13 +102,11 @@ func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
 func (u Users) SignOut(w http.ResponseWriter, r *http.Request) {
 	token, err := cookies.ReadCookie(r, cookies.CookieSession)
 	if err != nil {
-		// TODO: Errors reading session cookie
 		u.Templates.SignIn.Execute(w, r, nil, err)
 		return
 	}
 	err = u.SessionService.Delete(token)
 	if err != nil {
-		// TODO: Errors deleting session
 		u.Templates.SignIn.Execute(w, r, nil, err)
 		return
 	}
@@ -146,7 +142,6 @@ func (u Users) ProcessForgotPassword(w http.ResponseWriter, r *http.Request) {
 	resetURL := "http://" + u.ServerAddress + "/reset-pw?" + vals.Encode()
 	err = u.EmailService.ForgotPassword(data.Email, resetURL)
 	if err != nil {
-		// TODO: Errors send forgot password email
 		u.Templates.ForgotPassword.Execute(w, r, data, err)
 		return
 	}
@@ -184,7 +179,6 @@ func (u Users) ProcessResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 	err = u.UserService.UpdatePassword(user.ID, data.Password)
 	if err != nil {
-		// TODO: Errors update password
 		u.Templates.ResetPassword.Execute(w, r, data, err)
 		return
 	}
@@ -193,7 +187,6 @@ func (u Users) ProcessResetPassword(w http.ResponseWriter, r *http.Request) {
 	// Any errors from this point should redirect the user to the sign in page.
 	session, err := u.SessionService.Create(user.ID)
 	if err != nil {
-		// TODO: Errors session create
 		u.Templates.SignIn.Execute(w, r, nil, err)
 		return
 	}
