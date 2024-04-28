@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -48,7 +49,9 @@ func (prs *PasswordResetService) Create(email string) (*PasswordReset, error) {
 	`, email)
 	err := row.Scan(&userID)
 	if err != nil {
-		// TODO: Consider returning specific error when user doesn't exist
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrEmailNotFound
+		}
 		return nil, fmt.Errorf("create: %w", err)
 	}
 

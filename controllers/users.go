@@ -133,7 +133,10 @@ func (u Users) ProcessForgotPassword(w http.ResponseWriter, r *http.Request) {
 	data.Email = r.FormValue("email")
 	pwReset, err := u.PasswordResetService.Create(data.Email)
 	if err != nil {
-		// TODO: Errors password reset creation
+		if errors.Is(err, models.ErrEmailNotFound) {
+			err = errors.Public(err,
+				"An account could not be found with the email address provided.")
+		}
 		u.Templates.ForgotPassword.Execute(w, r, data, err)
 		return
 	}
