@@ -45,7 +45,9 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, models.ErrEmailTaken) {
 			err = errors.Public(err,
-				"That email address is already associated with an account.")
+				"That email address is already associated with an account.",
+				http.StatusConflict,
+			)
 		}
 		u.Templates.New.Execute(w, r, data, err)
 		return
@@ -78,9 +80,13 @@ func (u Users) Authenticate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, models.ErrEmailNotFound) {
 			err = errors.Public(err,
-				"An account could not be found with the email address provided.")
+				"An account could not be found with the email address provided.",
+				http.StatusNotFound,
+			)
 		} else if errors.Is(err, models.ErrBadPassword) {
-			err = errors.Public(err, "The provided password is incorrect.")
+			err = errors.Public(err, "The provided password is incorrect.",
+				http.StatusBadRequest,
+			)
 		}
 		u.Templates.SignIn.Execute(w, r, data, err)
 		return
@@ -131,7 +137,9 @@ func (u Users) ProcessForgotPassword(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, models.ErrEmailNotFound) {
 			err = errors.Public(err,
-				"An account could not be found with the email address provided.")
+				"An account could not be found with the email address provided.",
+				http.StatusNotFound,
+			)
 		}
 		u.Templates.ForgotPassword.Execute(w, r, data, err)
 		return
@@ -168,11 +176,15 @@ func (u Users) ProcessResetPassword(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, models.ErrInvalidPwResetToken) {
 			err = errors.Public(err,
 				`The provided password reset token is invalid.
-				Please try generating a new token through the "Forgot your password?" page.`)
+				Please try generating a new token through the "Forgot your password?" page.`,
+				http.StatusBadRequest,
+			)
 		} else if errors.Is(err, models.ErrExpiredPwResetToken) {
 			err = errors.Public(err,
 				`The provided password reset token has expired.
-				Please try generating a new token through the "Forgot your password?" page.`)
+				Please try generating a new token through the "Forgot your password?" page.`,
+				http.StatusBadRequest,
+			)
 		}
 		u.Templates.ResetPassword.Execute(w, r, data, err)
 		return

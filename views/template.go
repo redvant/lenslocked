@@ -17,6 +17,7 @@ import (
 
 type public interface {
 	Public() string
+	StatusCode() int
 }
 
 func Must(t Template, err error) Template {
@@ -84,6 +85,7 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request,
 			},
 		},
 	)
+	w.WriteHeader(getStatusCode(errs...))
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	var buf bytes.Buffer
 	err = tpl.Execute(&buf, data)
@@ -111,4 +113,17 @@ func errMessages(errs ...error) []string {
 		}
 	}
 	return msgs
+}
+
+func getStatusCode(errs ...error) int {
+	if len(errs) <= 0 {
+		return http.StatusOK
+	}
+	for _, err := range errs {
+		var pubErr public
+		if errors.As(err, &pubErr) {
+			return pubErr.StatusCode()
+		}
+	}
+	return http.StatusInternalServerError
 }
