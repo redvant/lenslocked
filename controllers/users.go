@@ -78,7 +78,7 @@ func (u Users) Authenticate(w http.ResponseWriter, r *http.Request) {
 	data.Password = r.FormValue("password")
 	user, err := u.UserService.Authenticate(data.Email, data.Password)
 	if err != nil {
-		if errors.Is(err, models.ErrEmailNotFound) {
+		if errors.Is(err, models.ErrNotFound) {
 			err = errors.Public(err,
 				"An account could not be found with the email address provided.",
 				http.StatusNotFound,
@@ -135,7 +135,7 @@ func (u Users) ProcessForgotPassword(w http.ResponseWriter, r *http.Request) {
 	data.Email = r.FormValue("email")
 	pwReset, err := u.PasswordResetService.Create(data.Email)
 	if err != nil {
-		if errors.Is(err, models.ErrEmailNotFound) {
+		if errors.Is(err, models.ErrNotFound) {
 			err = errors.Public(err,
 				"An account could not be found with the email address provided.",
 				http.StatusNotFound,

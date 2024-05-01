@@ -6,8 +6,6 @@ import (
 	"fmt"
 )
 
-var ErrGalleryNotFound = errors.New("models: gallery not found")
-
 type Gallery struct {
 	ID     int
 	UserID int
@@ -46,7 +44,7 @@ func (gs *GalleryService) ByID(id int) (*Gallery, error) {
 	err := row.Scan(&gallery.Title, &gallery.UserID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrGalleryNotFound
+			return nil, ErrNotFound
 		}
 		return nil, fmt.Errorf("by id: %w", err)
 	}

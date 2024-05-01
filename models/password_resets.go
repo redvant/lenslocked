@@ -16,11 +16,6 @@ const (
 	DefaultResetDuration = 1 * time.Hour
 )
 
-var (
-	ErrInvalidPwResetToken = errors.New("models: Invalid password reset token")
-	ErrExpiredPwResetToken = errors.New("models: Expired password reset token")
-)
-
 type PasswordReset struct {
 	ID     int
 	UserID int
@@ -55,7 +50,7 @@ func (prs *PasswordResetService) Create(email string) (*PasswordReset, error) {
 	err := row.Scan(&userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrEmailNotFound
+			return nil, ErrNotFound
 		}
 		return nil, fmt.Errorf("create: %w", err)
 	}
