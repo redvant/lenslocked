@@ -58,6 +58,9 @@ func main() {
 		DB: db,
 	}
 	emailService := models.NewEmailService(cfg.SMTP)
+	galleryService := &models.GalleryService{
+		DB: db,
+	}
 
 	// Setup middleware
 	usersMw := middleware.Users{
@@ -91,6 +94,12 @@ func main() {
 	usersC.Templates.ResetPassword = views.Must(views.ParseFS(
 		templates.FS, "tailwind.gohtml", "reset-pw.gohtml",
 	))
+	galleriesC := controllers.Galleries{
+		GalleryService: galleryService,
+	}
+	galleriesC.Templates.New = views.Must(views.ParseFS(
+		templates.FS, "tailwind.gohtml", "galleries/new.gohtml",
+	))
 
 	// Setup router and routes
 	router := http.NewServeMux()
@@ -116,6 +125,8 @@ func main() {
 		fmt.Fprint(w, "Hello")
 	})
 	router.Handle("/users/me/", http.StripPrefix("/users/me", usersMw.RequireUser(userRouter)))
+
+	router.HandleFunc("GET /galleries/new", galleriesC.New)
 
 	// Setup general middleware chain stack
 	mwStack := middleware.CreateStack(
