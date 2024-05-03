@@ -69,6 +69,7 @@ func main() {
 
 	csrfMw := csrf.Protect([]byte(cfg.CSRF.Key),
 		csrf.Secure(cfg.CSRF.Secure),
+		csrf.Path("/"),
 	)
 
 	// Setup controllers
