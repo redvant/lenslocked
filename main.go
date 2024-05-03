@@ -126,7 +126,9 @@ func main() {
 	})
 	router.Handle("/users/me/", http.StripPrefix("/users/me", usersMw.RequireUser(userRouter)))
 
-	router.HandleFunc("GET /galleries/new", galleriesC.New)
+	galleriesRouter := http.NewServeMux()
+	galleriesRouter.HandleFunc("GET /new", galleriesC.New)
+	router.Handle("/galleries/", http.StripPrefix("/galleries", usersMw.RequireUser(galleriesRouter)))
 
 	// Setup general middleware chain stack
 	mwStack := middleware.CreateStack(
