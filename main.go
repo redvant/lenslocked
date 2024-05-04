@@ -129,6 +129,7 @@ func main() {
 
 	galleriesRouter := http.NewServeMux()
 	galleriesRouter.HandleFunc("GET /new", galleriesC.New)
+	galleriesRouter.HandleFunc("POST /", galleriesC.Create)
 	router.Handle("/galleries/", http.StripPrefix("/galleries", usersMw.RequireUser(galleriesRouter)))
 
 	// Setup general middleware chain stack
