@@ -134,6 +134,7 @@ func main() {
 	galleriesRouter.HandleFunc("GET /new", galleriesC.New)
 	galleriesRouter.HandleFunc("POST /{$}", galleriesC.Create)
 	galleriesRouter.HandleFunc("GET /{id}/edit", galleriesC.Edit)
+	galleriesRouter.HandleFunc("POST /{id}", galleriesC.Update)
 	router.Handle("/galleries/", http.StripPrefix("/galleries", usersMw.RequireUser(galleriesRouter)))
 
 	// Setup general middleware chain stack
