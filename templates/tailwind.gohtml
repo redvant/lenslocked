@@ -21,14 +21,18 @@
             <div class="text-4xl/9 pr-12 font-serif">
                 Lenslocked
             </div>
-            <div class="flex-grow">
+            <div class="">
                 <a class="text-lg font-semibold hover:text-blue-100 pr-8" href="/">Home</a>
                 <a class="text-lg font-semibold hover:text-blue-100 pr-8" href="/contact">Contact</a>
                 <a class="text-lg font-semibold hover:text-blue-100 pr-8" href="/faq">FAQ</a>
             </div>
-            <div>
-                {{if currentUser}}
-                    <div class="flex items-center gap-8">
+			{{if currentUser}}
+				<div class="flex-grow flex flex-row-reverse">
+					<a class="text-lg font-semibold hover:text-blue-100 pr-8" href="/galleries">
+						My Galleries
+					</a>
+				</div>
+				<div class="flex items-center gap-8">
 				    <form action="/signout" method="post" class="inline">
 					    <div class="hidden">
 						    {{csrfField}}
@@ -38,12 +42,12 @@
                     <a title="{{currentUser.Email}}" class="hover:text-blue-100" href="/users/me">
                         <i class="fa-solid fa-circle-user fa-2xl"></i>
                     </a>
-                    </div>
-                {{else}}
-                    <a class="hover:text-blue-100 pr-4" href="/signin">Sign in</a>
-                    <a class="bg-blue-700 hover:bg-blue-600 px-4 py-3 rounded-md" href="/signup">Sign up</a>
-                {{end}}
-            </div>
+				</div>
+			{{else}}
+				<div class="flex-grow"></div>
+				<a class="hover:text-blue-100 pr-4" href="/signin">Sign in</a>
+				<a class="bg-blue-700 hover:bg-blue-600 px-4 py-3 rounded-md" href="/signup">Sign up</a>
+			{{end}}
         </nav>
     </header>
 {{end}}

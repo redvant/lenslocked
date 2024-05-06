@@ -104,6 +104,9 @@ func main() {
 	galleriesC.Templates.Edit = views.Must(views.ParseFS(
 		templates.FS, "tailwind.gohtml", "galleries/edit.gohtml",
 	))
+	galleriesC.Templates.Index = views.Must(views.ParseFS(
+		templates.FS, "tailwind.gohtml", "galleries/index.gohtml",
+	))
 
 	// Setup router and routes
 	router := http.NewServeMux()
@@ -135,6 +138,7 @@ func main() {
 	galleriesRouter.HandleFunc("POST /{$}", galleriesC.Create)
 	galleriesRouter.HandleFunc("GET /{id}/edit", galleriesC.Edit)
 	galleriesRouter.HandleFunc("POST /{id}", galleriesC.Update)
+	galleriesRouter.HandleFunc("GET /{$}", galleriesC.Index)
 	router.Handle("/galleries/", http.StripPrefix("/galleries", usersMw.RequireUser(galleriesRouter)))
 
 	// Setup general middleware chain stack
