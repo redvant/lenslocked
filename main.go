@@ -107,6 +107,9 @@ func main() {
 	galleriesC.Templates.Index = views.Must(views.ParseFS(
 		templates.FS, "tailwind.gohtml", "galleries/index.gohtml",
 	))
+	galleriesC.Templates.Show = views.Must(views.ParseFS(
+		templates.FS, "tailwind.gohtml", "galleries/show.gohtml",
+	))
 
 	// Setup router and routes
 	router := http.NewServeMux()
