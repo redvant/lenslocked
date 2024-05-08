@@ -1,8 +1,8 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"strconv"
 
@@ -68,12 +68,39 @@ func (g Galleries) Show(w http.ResponseWriter, r *http.Request) {
 	}
 	data.ID = gallery.ID
 	data.Title = gallery.Title
-	for i := 0; i < 20; i++ {
-		w, h := rand.Intn(500)+200, rand.Intn(500)+200
-		catImageURL := fmt.Sprintf("https://placekitten.com/%d/%d", w, h)
-		data.Images = append(data.Images, catImageURL)
-	}
+	data.Images = getCatImages()
 	g.Templates.Show.Execute(w, r, data)
+}
+
+func getCatImages() []string {
+	var catUrls []string
+	resp, err := http.Get("https://api.thecatapi.com/v1/images/search?limit=10")
+	if err != nil {
+		fmt.Printf("getCatImages: %v", err)
+		return catUrls
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("getCatImages status:", resp.Status)
+		return catUrls
+	}
+	var catsResponse catsResponse
+	err = json.NewDecoder(resp.Body).Decode(&catsResponse)
+	if err != nil {
+		fmt.Printf("getCatImages: %v", err)
+		return catUrls
+	}
+	for _, cat := range catsResponse {
+		catUrls = append(catUrls, cat.URL)
+	}
+	return catUrls
+}
+
+type catsResponse []struct {
+	ID     string `json:"id"`
+	URL    string `json:"url"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
 }
 
 func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
