@@ -7,9 +7,10 @@ import (
 )
 
 type Gallery struct {
-	ID     int
-	UserID int
-	Title  string
+	ID        int
+	UserID    int
+	Title     string
+	Published bool
 }
 
 type GalleryService struct {
@@ -37,11 +38,11 @@ func (gs *GalleryService) ByID(id int) (*Gallery, error) {
 		ID: id,
 	}
 	row := gs.DB.QueryRow(`
-		SELECT title, user_id
+		SELECT title, user_id, published
 		FROM galleries
 		WHERE id = $1;
 	`, gallery.ID)
-	err := row.Scan(&gallery.Title, &gallery.UserID)
+	err := row.Scan(&gallery.Title, &gallery.UserID, &gallery.Published)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
@@ -53,7 +54,7 @@ func (gs *GalleryService) ByID(id int) (*Gallery, error) {
 
 func (gs *GalleryService) ByUserID(userID int) ([]Gallery, error) {
 	rows, err := gs.DB.Query(`
-		SELECT id, title
+		SELECT id, title, published
 		FROM galleries
 		WHERE user_id = $1
 	`, userID)
@@ -63,7 +64,7 @@ func (gs *GalleryService) ByUserID(userID int) ([]Gallery, error) {
 	var galleries []Gallery
 	for rows.Next() {
 		gallery := Gallery{UserID: userID}
-		err = rows.Scan(&gallery.ID, &gallery.Title)
+		err = rows.Scan(&gallery.ID, &gallery.Title, &gallery.Published)
 		if err != nil {
 			return nil, fmt.Errorf("query galleries by user: %w", err)
 		}
