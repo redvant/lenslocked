@@ -99,11 +99,13 @@ func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var data struct {
-		ID    int
-		Title string
+		ID        int
+		Title     string
+		Published bool
 	}
 	data.ID = gallery.ID
 	data.Title = gallery.Title
+	data.Published = gallery.Published
 	g.Templates.Edit.Execute(w, r, data)
 }
 

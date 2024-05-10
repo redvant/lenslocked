@@ -18,14 +18,32 @@
         </div>
     </form>
 	<!-- Danger Actions -->
-	<div class="py-4">
-		<h2 class="mb-1">Dangerous Actions</h2>
-		<form action="/galleries/{{.ID}}/delete" method="post"
-			onsubmit="return confirm('Do you really want to delete this gallery?');">
-			<div class="hidden">{{csrfField}}</div>
-            <button type="submit" class="py-2 px-8 bg-red-600 hover:bg-red-700
-            text-white rounded font-bold text-lg">Delete</button>
-		</form>
+	<div class="mt-2 border-2 border-gray-400 rounded-md p-2">
+		<h2 class="mb-1 font-semibold">Dangerous Actions</h2>
+		<hr class="mb-3 border-1 border-gray-400">
+		<div class="flex gap-12">
+			<form action="/galleries/{{.ID}}/delete" method="post"
+				onsubmit="return confirm('Do you really want to delete this gallery?');">
+				<div class="hidden">{{csrfField}}</div>
+				<button type="submit" class="py-2 px-8 bg-red-600 hover:bg-red-700
+				text-white rounded font-bold text-lg">Delete</button>
+			</form>
+			{{if .Published}}
+			<form action="/galleries/{{.ID}}/unpublish" method="post"
+				onsubmit="return confirm('Do you really want to unpublish this gallery?');">
+				<div class="hidden">{{csrfField}}</div>
+				<button type="submit" class="py-2 px-8 bg-amber-400 hover:bg-amber-500
+				text-white rounded font-bold text-lg">Unpublish</button>
+			</form>
+			{{else}}
+			<form action="/galleries/{{.ID}}/publish" method="post"
+				onsubmit="return confirm('Do you really want to publish this gallery?');">
+				<div class="hidden">{{csrfField}}</div>
+				<button type="submit" class="py-2 px-8 bg-green-600 hover:bg-green-700
+				text-white rounded font-bold text-lg">Publish</button>
+			</form>
+			{{end}}
+		</div>
 	</div>
 </div>
 {{end}}
