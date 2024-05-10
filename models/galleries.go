@@ -98,3 +98,27 @@ func (gs *GalleryService) Delete(id int) error {
 	}
 	return nil
 }
+
+func (gs *GalleryService) Publish(id int) error {
+	_, err := gs.DB.Exec(`
+		UPDATE galleries
+		SET published = TRUE
+		WHERE id = $1;
+	`, id)
+	if err != nil {
+		return fmt.Errorf("publish gallery: %w", err)
+	}
+	return nil
+}
+
+func (gs *GalleryService) Unpublish(id int) error {
+	_, err := gs.DB.Exec(`
+		UPDATE galleries
+		SET published = FALSE
+		WHERE id = $1;
+	`, id)
+	if err != nil {
+		return fmt.Errorf("unpublish gallery: %w", err)
+	}
+	return nil
+}
