@@ -149,6 +149,7 @@ func main() {
 	galleriesRouter.HandleFunc("POST /{id}/delete", galleriesC.Delete)
 	galleriesRouter.HandleFunc("POST /{id}/publish", galleriesC.Publish)
 	galleriesRouter.HandleFunc("POST /{id}/unpublish", galleriesC.Unpublish)
+	galleriesRouter.HandleFunc("GET /{id}/images/{filename}", galleriesC.Image)
 	router.Handle("/galleries/", http.StripPrefix("/galleries", usersMw.RequireUser(galleriesRouter)))
 
 	router.HandleFunc("GET /g/{id}", galleriesC.ShowPublished)
