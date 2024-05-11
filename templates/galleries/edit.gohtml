@@ -18,6 +18,9 @@
         </div>
     </form>
 	<div class="py-4">
+		{{template "upload_image_form" .}}
+	</div>
+	<div class="py-4">
 		<h2 class="pb-1 text-sm font-semibold text-gray-800">
 			Current Images
 		</h2>
@@ -70,6 +73,28 @@
 	{{csrfField}}
 	<button type="submit" class="p-1 text-xs text-red-800 bg-red-100 border border-red-400 rounded">
 		Delete
+	</button>
+</form>
+{{end}}
+
+{{define "upload_image_form"}}
+<form action="/galleries/{{.ID}}/images"
+	method="post"
+	enctype="multipart/form-data">
+	{{csrfField}}
+	<div class="py-2">
+		<label for="images" class="block mb-2 text-sm font-semibold text-gray-800">
+			Add Images
+			<p class="py-2 text-xs text-gray-600 font-normal">
+				Please only upload jpg, png and gif files.
+			</p>
+		</label>
+		<input type="file" multiple name="images" id="images"
+			accept="image/png, image/jpeg, image/gif">
+	</div>
+	<button type="submit" class="py-2 px-8 text-lg text-white font-bold
+		bg-indigo-600 hover:bg-indigo-700 rounded">
+		Upload
 	</button>
 </form>
 {{end}}
