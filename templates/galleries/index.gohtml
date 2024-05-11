@@ -33,6 +33,25 @@
                         rounded border border-red-600
                         text-red-600 text-xs">Delete</button>
                 </form>
+				{{if .Published}}
+                <form action="/galleries/{{.ID}}/unpublish" method="post"
+                    onsubmit="return confirm('Do you really want to unpublish this gallery?');">
+                    {{csrfField}}
+                    <button type="submit"
+                        class="py-1 px-2 bg-orange-100 hover:bg-orange-200
+                        rounded border border-orange-600
+                        text-orange-600 text-xs">Unpublish</button>
+                </form>
+				{{else}}
+                <form action="/galleries/{{.ID}}/publish" method="post"
+                    onsubmit="return confirm('Do you really want to publish this gallery?');">
+                    {{csrfField}}
+                    <button type="submit"
+                        class="py-1 px-2 bg-green-100 hover:bg-green-200
+                        rounded border border-green-600
+                        text-green-600 text-xs">Publish</button>
+                </form>
+				{{end}}
             </td>
         </tr>
         {{end}}

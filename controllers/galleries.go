@@ -126,8 +126,9 @@ func (g Galleries) Update(w http.ResponseWriter, r *http.Request) {
 
 func (g Galleries) Index(w http.ResponseWriter, r *http.Request) {
 	type Gallery struct {
-		ID    int
-		Title string
+		ID        int
+		Title     string
+		Published bool
 	}
 	var data struct {
 		Galleries []Gallery
@@ -139,8 +140,9 @@ func (g Galleries) Index(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, gallery := range galleries {
 		data.Galleries = append(data.Galleries, Gallery{
-			ID:    gallery.ID,
-			Title: gallery.Title,
+			ID:        gallery.ID,
+			Title:     gallery.Title,
+			Published: gallery.Published,
 		})
 	}
 	g.Templates.Index.Execute(w, r, data)
