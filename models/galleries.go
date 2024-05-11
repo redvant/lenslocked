@@ -11,7 +11,9 @@ import (
 const DefaultImagesDir = "images"
 
 type Image struct {
-	Path string
+	GalleryID int
+	Path      string
+	Filename  string
 }
 
 type Gallery struct {
@@ -145,7 +147,11 @@ func (gs *GalleryService) Images(galleryID int) ([]Image, error) {
 	var images []Image
 	for _, file := range allFiles {
 		if hasExtension(file, gs.extensions()) {
-			images = append(images, Image{Path: file})
+			images = append(images, Image{
+				GalleryID: galleryID,
+				Path:      file,
+				Filename:  filepath.Base(file),
+			})
 		}
 	}
 	return images, nil
