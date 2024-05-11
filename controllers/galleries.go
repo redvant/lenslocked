@@ -46,6 +46,22 @@ func (g Galleries) Create(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, editPath, http.StatusFound)
 }
 
+func (g Galleries) ShowPublished(w http.ResponseWriter, r *http.Request) {
+	gallery, err := g.galleryByID(w, r, galleryMustBePublished)
+	if err != nil {
+		return
+	}
+	var data struct {
+		ID     int
+		Title  string
+		Images []string
+	}
+	data.ID = gallery.ID
+	data.Title = gallery.Title
+	data.Images = getCatImages()
+	g.Templates.Show.Execute(w, r, data)
+}
+
 func (g Galleries) Show(w http.ResponseWriter, r *http.Request) {
 	gallery, err := g.galleryByID(w, r, userMustOwnGallery)
 	if err != nil {
@@ -218,6 +234,14 @@ func userMustOwnGallery(w http.ResponseWriter, r *http.Request, gallery *models.
 	if gallery.UserID != user.ID {
 		http.Error(w, "You are not authorized to access this gallery", http.StatusForbidden)
 		return fmt.Errorf("user does not have access to this gallery")
+	}
+	return nil
+}
+
+func galleryMustBePublished(w http.ResponseWriter, r *http.Request, gallery *models.Gallery) error {
+	if !gallery.Published {
+		http.Error(w, "This gallery is not public", http.StatusForbidden)
+		return fmt.Errorf("the gallery is not published")
 	}
 	return nil
 }

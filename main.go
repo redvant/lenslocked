@@ -148,6 +148,8 @@ func main() {
 	galleriesRouter.HandleFunc("POST /{id}/unpublish", galleriesC.Unpublish)
 	router.Handle("/galleries/", http.StripPrefix("/galleries", usersMw.RequireUser(galleriesRouter)))
 
+	router.HandleFunc("GET /g/{id}", galleriesC.ShowPublished)
+
 	// Setup general middleware chain stack
 	mwStack := middleware.CreateStack(
 		middleware.Logging,
