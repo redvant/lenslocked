@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strconv"
 
 	"github.com/redvant/lenslocked/context"
@@ -162,7 +163,7 @@ func (g Galleries) Unpublish(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Galleries) Image(w http.ResponseWriter, r *http.Request) {
-	filename := r.PathValue("filename")
+	filename := g.filename(r)
 	gallery, err := g.galleryByID(w, r, userMustOwnGallery)
 	if err != nil {
 		return
@@ -181,7 +182,7 @@ func (g Galleries) Image(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Galleries) PublishedImage(w http.ResponseWriter, r *http.Request) {
-	filename := r.PathValue("filename")
+	filename := g.filename(r)
 	gallery, err := g.galleryByID(w, r, galleryMustBePublished)
 	if err != nil {
 		return
@@ -200,7 +201,7 @@ func (g Galleries) PublishedImage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Galleries) DeleteImage(w http.ResponseWriter, r *http.Request) {
-	filename := r.PathValue("filename")
+	filename := g.filename(r)
 	gallery, err := g.galleryByID(w, r, userMustOwnGallery)
 	if err != nil {
 		return
@@ -217,6 +218,15 @@ func (g Galleries) DeleteImage(w http.ResponseWriter, r *http.Request) {
 	}
 	editPath := fmt.Sprintf("/galleries/%d/edit", gallery.ID)
 	http.Redirect(w, r, editPath, http.StatusFound)
+}
+
+// filename will take the path value form the request and
+// returns only the base of the filename ex. "test.png" to
+// prevent the possible access of other directories
+func (g Galleries) filename(r *http.Request) string {
+	filename := r.PathValue("filename")
+	filename = filepath.Base(filename)
+	return filename
 }
 
 type galleryOpt func(http.ResponseWriter, *http.Request, *models.Gallery) error
