@@ -183,6 +183,25 @@ func (g Galleries) Image(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, image.Path)
 }
 
+func (g Galleries) PublishedImage(w http.ResponseWriter, r *http.Request) {
+	filename := r.PathValue("filename")
+	gallery, err := g.galleryByID(w, r, galleryMustBePublished)
+	if err != nil {
+		return
+	}
+	image, err := g.GalleryService.Image(gallery.ID, filename)
+	if err != nil {
+		if errors.Is(err, models.ErrNotFound) {
+			http.Error(w, "Image not found", http.StatusNotFound)
+			return
+		}
+		fmt.Println(err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+	http.ServeFile(w, r, image.Path)
+}
+
 type galleryOpt func(http.ResponseWriter, *http.Request, *models.Gallery) error
 
 func (g Galleries) galleryByID(w http.ResponseWriter, r *http.Request, opts ...galleryOpt) (*models.Gallery, error) {

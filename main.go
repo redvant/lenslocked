@@ -153,6 +153,7 @@ func main() {
 	router.Handle("/galleries/", http.StripPrefix("/galleries", usersMw.RequireUser(galleriesRouter)))
 
 	router.HandleFunc("GET /g/{id}", galleriesC.ShowPublished)
+	router.HandleFunc("GET /g/{id}/images/{filename}", galleriesC.PublishedImage)
 
 	// Setup general middleware chain stack
 	mwStack := middleware.CreateStack(
