@@ -47,7 +47,7 @@ func (g Galleries) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Galleries) Show(w http.ResponseWriter, r *http.Request) {
-	gallery, err := g.galleryByID(w, r)
+	gallery, err := g.galleryByID(w, r, userMustOwnGallery)
 	if err != nil {
 		return
 	}
@@ -216,7 +216,7 @@ func (g Galleries) galleryByID(w http.ResponseWriter, r *http.Request, opts ...g
 func userMustOwnGallery(w http.ResponseWriter, r *http.Request, gallery *models.Gallery) error {
 	user := context.User(r.Context())
 	if gallery.UserID != user.ID {
-		http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
+		http.Error(w, "You are not authorized to access this gallery", http.StatusForbidden)
 		return fmt.Errorf("user does not have access to this gallery")
 	}
 	return nil
