@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -52,15 +51,11 @@ func (g Galleries) ShowPublished(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	var data struct {
-		ID     int
-		Title  string
-		Images []string
+	galleryData, err := g.galleryData(w, gallery)
+	if err != nil {
+		return
 	}
-	data.ID = gallery.ID
-	data.Title = gallery.Title
-	data.Images = getCatImages()
-	g.Templates.ShowPublished.Execute(w, r, data)
+	g.Templates.ShowPublished.Execute(w, r, galleryData)
 }
 
 func (g Galleries) Show(w http.ResponseWriter, r *http.Request) {
@@ -68,46 +63,11 @@ func (g Galleries) Show(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	var data struct {
-		ID     int
-		Title  string
-		Images []string
-	}
-	data.ID = gallery.ID
-	data.Title = gallery.Title
-	data.Images = getCatImages()
-	g.Templates.Show.Execute(w, r, data)
-}
-
-func getCatImages() []string {
-	var catUrls []string
-	resp, err := http.Get("https://api.thecatapi.com/v1/images/search?limit=10")
+	galleryData, err := g.galleryData(w, gallery)
 	if err != nil {
-		fmt.Printf("getCatImages: %v", err)
-		return catUrls
+		return
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		fmt.Println("getCatImages status:", resp.Status)
-		return catUrls
-	}
-	var catsResponse catsResponse
-	err = json.NewDecoder(resp.Body).Decode(&catsResponse)
-	if err != nil {
-		fmt.Printf("getCatImages: %v", err)
-		return catUrls
-	}
-	for _, cat := range catsResponse {
-		catUrls = append(catUrls, cat.URL)
-	}
-	return catUrls
-}
-
-type catsResponse []struct {
-	ID     string `json:"id"`
-	URL    string `json:"url"`
-	Width  int    `json:"width"`
-	Height int    `json:"height"`
+	g.Templates.Show.Execute(w, r, galleryData)
 }
 
 func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
@@ -245,4 +205,33 @@ func galleryMustBePublished(w http.ResponseWriter, r *http.Request, gallery *mod
 		return fmt.Errorf("the gallery is not published")
 	}
 	return nil
+}
+
+type Image struct {
+	GalleryID int
+	Filename  string
+}
+type GalleryData struct {
+	ID     int
+	Title  string
+	Images []Image
+}
+
+func (g Galleries) galleryData(w http.ResponseWriter, gallery *models.Gallery) (GalleryData, error) {
+	var data GalleryData
+	images, err := g.GalleryService.Images(gallery.ID)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return data, err
+	}
+	data.ID = gallery.ID
+	data.Title = gallery.Title
+	for _, image := range images {
+		data.Images = append(data.Images, Image{
+			image.GalleryID,
+			image.Filename,
+		})
+	}
+	return data, nil
 }
