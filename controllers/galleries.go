@@ -76,15 +76,11 @@ func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	var data struct {
-		ID        int
-		Title     string
-		Published bool
+	galleryData, err := g.galleryData(w, gallery)
+	if err != nil {
+		return
 	}
-	data.ID = gallery.ID
-	data.Title = gallery.Title
-	data.Published = gallery.Published
-	g.Templates.Edit.Execute(w, r, data)
+	g.Templates.Edit.Execute(w, r, galleryData)
 }
 
 func (g Galleries) Update(w http.ResponseWriter, r *http.Request) {
@@ -252,9 +248,10 @@ type Image struct {
 	FilenameEscaped string
 }
 type GalleryData struct {
-	ID     int
-	Title  string
-	Images []Image
+	ID        int
+	Title     string
+	Published bool
+	Images    []Image
 }
 
 func (g Galleries) galleryData(w http.ResponseWriter, gallery *models.Gallery) (GalleryData, error) {
@@ -267,6 +264,7 @@ func (g Galleries) galleryData(w http.ResponseWriter, gallery *models.Gallery) (
 	}
 	data.ID = gallery.ID
 	data.Title = gallery.Title
+	data.Published = gallery.Published
 	for _, image := range images {
 		data.Images = append(data.Images, Image{
 			GalleryID:       image.GalleryID,
