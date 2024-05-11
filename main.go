@@ -110,6 +110,9 @@ func main() {
 	galleriesC.Templates.Show = views.Must(views.ParseFS(
 		templates.FS, "tailwind.gohtml", "galleries/show.gohtml",
 	))
+	galleriesC.Templates.ShowPublished = views.Must(views.ParseFS(
+		templates.FS, "public.gohtml", "galleries/showPublished.gohtml",
+	))
 
 	// Setup router and routes
 	router := http.NewServeMux()

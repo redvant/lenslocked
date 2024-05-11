@@ -13,10 +13,11 @@ import (
 
 type Galleries struct {
 	Templates struct {
-		New   Template
-		Show  Template
-		Edit  Template
-		Index Template
+		New           Template
+		Show          Template
+		Edit          Template
+		Index         Template
+		ShowPublished Template
 	}
 	GalleryService *models.GalleryService
 }
@@ -59,7 +60,7 @@ func (g Galleries) ShowPublished(w http.ResponseWriter, r *http.Request) {
 	data.ID = gallery.ID
 	data.Title = gallery.Title
 	data.Images = getCatImages()
-	g.Templates.Show.Execute(w, r, data)
+	g.Templates.ShowPublished.Execute(w, r, data)
 }
 
 func (g Galleries) Show(w http.ResponseWriter, r *http.Request) {

@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/210e290d0b.js" crossorigin="anonymous"></script>
+</head>
+<body class="min-h-screen bg-gray-100">
+  {{template "alert-banner"}}
+  {{template "page" .}}
+  {{template "scripts"}}
+</body>
+</html>
+
+{{define "alert-banner"}}
+    {{if errors}}
+        <div class="py-4 px-2">
+            {{range errors}}
+                <div class="closable flex bg-red-100 rounded px-2 py-2 text-red-800 mb-2">
+                    <div class="flex-grow">
+                        {{.}}
+                    </div>
+                    <a href="#" onclick="closeAlert(event)">
+                        <i class="fa-regular fa-circle-xmark fa-xl"></i>
+                    </a>
+                </div>
+            {{end}}
+        </div>
+    {{end}}
+{{end}}
+
+{{define "scripts"}}
+<script>
+    let closeAlert = (event) => {
+        let closable = event.target.closest(".closable");
+        closable.remove();
+    }
+</script>
+{{end}}
