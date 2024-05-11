@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/redvant/lenslocked/context"
@@ -246,8 +247,9 @@ func galleryMustBePublished(w http.ResponseWriter, r *http.Request, gallery *mod
 }
 
 type Image struct {
-	GalleryID int
-	Filename  string
+	GalleryID       int
+	Filename        string
+	FilenameEscaped string
 }
 type GalleryData struct {
 	ID     int
@@ -267,8 +269,9 @@ func (g Galleries) galleryData(w http.ResponseWriter, gallery *models.Gallery) (
 	data.Title = gallery.Title
 	for _, image := range images {
 		data.Images = append(data.Images, Image{
-			image.GalleryID,
-			image.Filename,
+			GalleryID:       image.GalleryID,
+			Filename:        image.Filename,
+			FilenameEscaped: url.PathEscape(image.Filename),
 		})
 	}
 	return data, nil
