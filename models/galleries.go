@@ -38,6 +38,11 @@ type GalleryService struct {
 	// a file to be uploaded can have. If not set, the GalleryService
 	// will default to: .png, .jpg, .jpeg, .gif.
 	AllowedExtensions []string
+
+	// AllowedContentTypes is used to restrict the content type that
+	// a file to be uploaded can have. If not set, the GalleryService
+	// will default to: image/png, image/jpeg, image/gif.
+	AllowedContentTypes []string
 }
 
 func (gs *GalleryService) Create(title string, userID int) (*Gallery, error) {
@@ -232,6 +237,9 @@ func (gs *GalleryService) extensions() []string {
 }
 
 func (gs *GalleryService) imageContentTypes() []string {
+	if len(gs.AllowedContentTypes) > 0 {
+		return gs.AllowedContentTypes
+	}
 	return []string{"image/png", "image/jpeg", "image/gif"}
 }
 
