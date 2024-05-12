@@ -236,6 +236,11 @@ func (gs *GalleryService) extensions() []string {
 	return []string{".png", ".jpg", ".jpeg", ".gif"}
 }
 
+func (gs *GalleryService) GetAllowedContentTypesString() string {
+	types := gs.imageContentTypes()
+	return strings.Join(types, ", ")
+}
+
 func (gs *GalleryService) imageContentTypes() []string {
 	if len(gs.AllowedContentTypes) > 0 {
 		return gs.AllowedContentTypes

@@ -223,7 +223,8 @@ func (g Galleries) UploadImage(w http.ResponseWriter, r *http.Request) {
 			var fileErr models.FileError
 			if errors.As(err, &fileErr) {
 				msg := fmt.Sprintf("%v has an invalid content type or extension. "+
-					"Only png, gif and jpg files can be uploaded.", fileHeader.Filename)
+					"Only %s files can be uploaded", fileHeader.Filename,
+					g.GalleryService.GetAllowedContentTypesString())
 				http.Error(w, msg, http.StatusBadRequest)
 				return
 			}
@@ -313,10 +314,11 @@ type Image struct {
 	FilenameEscaped string
 }
 type GalleryData struct {
-	ID        int
-	Title     string
-	Published bool
-	Images    []Image
+	ID           int
+	Title        string
+	Published    bool
+	Images       []Image
+	ContentTypes string
 }
 
 func (g Galleries) galleryData(w http.ResponseWriter, gallery *models.Gallery) (GalleryData, error) {
@@ -337,5 +339,6 @@ func (g Galleries) galleryData(w http.ResponseWriter, gallery *models.Gallery) (
 			FilenameEscaped: url.PathEscape(image.Filename),
 		})
 	}
+	data.ContentTypes = g.GalleryService.GetAllowedContentTypesString()
 	return data, nil
 }
