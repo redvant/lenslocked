@@ -33,6 +33,11 @@ type GalleryService struct {
 	// and locate images. If not set, the GalleryService will default
 	// to usign the DefaultImagesDir directory.
 	ImagesDir string
+
+	// AllowedExtensions is used to restrict the extensions that
+	// a file to be uploaded can have. If not set, the GalleryService
+	// will default to: .png, .jpg, .jpeg, .gif.
+	AllowedExtensions []string
 }
 
 func (gs *GalleryService) Create(title string, userID int) (*Gallery, error) {
@@ -220,6 +225,9 @@ func (gs *GalleryService) DeleteImage(galleryID int, filename string) error {
 }
 
 func (gs *GalleryService) extensions() []string {
+	if len(gs.AllowedExtensions) > 0 {
+		return gs.AllowedExtensions
+	}
 	return []string{".png", ".jpg", ".jpeg", ".gif"}
 }
 
