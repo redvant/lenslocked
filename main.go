@@ -19,6 +19,7 @@ type config struct {
 	SMTP   models.SMTPConfig
 	CSRF   CSRFConfig
 	Server ServerConfig
+	Images ImagesConfig
 }
 type CSRFConfig struct {
 	Key    string `env:"CSRF_KEY,required"`
@@ -26,6 +27,11 @@ type CSRFConfig struct {
 }
 type ServerConfig struct {
 	Address string `env:"SERVER_ADDRESS" envDefault:":3000"`
+}
+type ImagesConfig struct {
+	ImagesDir           string   `env:"IMAGES_DIR"`
+	AllowedExtensions   []string `env:"IMAGES_ALLOWED_EXTENSIONS" envSeparator:","`
+	AllowedContentTypes []string `env:"IMAGES_ALLOWED_TYPES" envSeparator:","`
 }
 
 func main() {
@@ -59,7 +65,10 @@ func main() {
 	}
 	emailService := models.NewEmailService(cfg.SMTP)
 	galleryService := &models.GalleryService{
-		DB: db,
+		DB:                  db,
+		ImagesDir:           cfg.Images.ImagesDir,
+		AllowedExtensions:   cfg.Images.AllowedExtensions,
+		AllowedContentTypes: cfg.Images.AllowedContentTypes,
 	}
 
 	// Setup middleware
