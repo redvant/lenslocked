@@ -19,7 +19,7 @@ type config struct {
 	SMTP   models.SMTPConfig
 	CSRF   CSRFConfig
 	Server ServerConfig
-	Images ImagesConfig
+	Images models.ImagesConfig
 }
 type CSRFConfig struct {
 	Key    string `env:"CSRF_KEY,required"`
@@ -27,11 +27,6 @@ type CSRFConfig struct {
 }
 type ServerConfig struct {
 	Address string `env:"SERVER_ADDRESS" envDefault:":3000"`
-}
-type ImagesConfig struct {
-	ImagesDir           string   `env:"IMAGES_DIR"`
-	AllowedExtensions   []string `env:"IMAGES_ALLOWED_EXTENSIONS" envSeparator:","`
-	AllowedContentTypes []string `env:"IMAGES_ALLOWED_TYPES" envSeparator:","`
 }
 
 func main() {
@@ -65,11 +60,9 @@ func main() {
 	}
 	emailService := models.NewEmailService(cfg.SMTP)
 	galleryService := &models.GalleryService{
-		DB:                  db,
-		ImagesDir:           cfg.Images.ImagesDir,
-		AllowedExtensions:   cfg.Images.AllowedExtensions,
-		AllowedContentTypes: cfg.Images.AllowedContentTypes,
+		DB: db,
 	}
+	imageService := models.NewImageService(cfg.Images)
 
 	// Setup middleware
 	usersMw := middleware.Users{
@@ -106,6 +99,7 @@ func main() {
 	))
 	galleriesC := controllers.Galleries{
 		GalleryService: galleryService,
+		ImageService:   imageService,
 	}
 	galleriesC.Templates.New = views.Must(views.ParseFS(
 		templates.FS, "tailwind.gohtml", "galleries/new.gohtml",

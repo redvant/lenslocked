@@ -21,6 +21,7 @@ type Galleries struct {
 		ShowPublished Template
 	}
 	GalleryService *models.GalleryService
+	ImageService   *models.ImageService
 }
 
 func (g Galleries) New(w http.ResponseWriter, r *http.Request) {
@@ -133,6 +134,10 @@ func (g Galleries) Delete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
+	err = g.ImageService.DeleteImages(gallery.ID)
+	if err != nil {
+		fmt.Println(err)
+	}
 	http.Redirect(w, r, "/galleries/", http.StatusFound)
 }
 
@@ -168,7 +173,7 @@ func (g Galleries) Image(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	image, err := g.GalleryService.Image(gallery.ID, filename)
+	image, err := g.ImageService.Image(gallery.ID, filename)
 	if err != nil {
 		if errors.Is(err, models.ErrNotFound) {
 			http.Error(w, "Image not found", http.StatusNotFound)
@@ -187,7 +192,7 @@ func (g Galleries) PublishedImage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	image, err := g.GalleryService.Image(gallery.ID, filename)
+	image, err := g.ImageService.Image(gallery.ID, filename)
 	if err != nil {
 		if errors.Is(err, models.ErrNotFound) {
 			http.Error(w, "Image not found", http.StatusNotFound)
@@ -218,13 +223,13 @@ func (g Galleries) UploadImage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer file.Close()
-		err = g.GalleryService.CreateImage(gallery.ID, fileHeader.Filename, file)
+		err = g.ImageService.CreateImage(gallery.ID, fileHeader.Filename, file)
 		if err != nil {
 			var fileErr models.FileError
 			if errors.As(err, &fileErr) {
 				msg := fmt.Sprintf("%v has an invalid content type or extension. "+
 					"Only %s files can be uploaded", fileHeader.Filename,
-					g.GalleryService.GetAllowedContentTypesString())
+					g.ImageService.GetAllowedContentTypesString())
 				http.Error(w, msg, http.StatusBadRequest)
 				return
 			}
@@ -242,7 +247,7 @@ func (g Galleries) DeleteImage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	err = g.GalleryService.DeleteImage(gallery.ID, filename)
+	err = g.ImageService.DeleteImage(gallery.ID, filename)
 	if err != nil {
 		if errors.Is(err, models.ErrNotFound) {
 			http.Error(w, "Image not found", http.StatusNotFound)
@@ -323,7 +328,7 @@ type GalleryData struct {
 
 func (g Galleries) galleryData(w http.ResponseWriter, gallery *models.Gallery) (GalleryData, error) {
 	var data GalleryData
-	images, err := g.GalleryService.Images(gallery.ID)
+	images, err := g.ImageService.Images(gallery.ID)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
@@ -339,6 +344,6 @@ func (g Galleries) galleryData(w http.ResponseWriter, gallery *models.Gallery) (
 			FilenameEscaped: url.PathEscape(image.Filename),
 		})
 	}
-	data.ContentTypes = g.GalleryService.GetAllowedContentTypesString()
+	data.ContentTypes = g.ImageService.GetAllowedContentTypesString()
 	return data, nil
 }
