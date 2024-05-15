@@ -160,6 +160,9 @@ func main() {
 	router.HandleFunc("GET /g/{id}", galleriesC.ShowPublished)
 	router.HandleFunc("GET /g/{id}/images/{filename}", galleriesC.PublishedImage)
 
+	assetsHandler := http.FileServer(http.Dir("assets"))
+	router.Handle("GET /assets/", http.StripPrefix("/assets", assetsHandler))
+
 	// Setup general middleware chain stack
 	mwStack := middleware.CreateStack(
 		middleware.Logging,
