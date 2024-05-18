@@ -1,0 +1,10 @@
+Dockerfile
+compose.**
+.git
+
+**/node_modules
+
+images
+notes
+Caddyfile
+asstes/styles.css
