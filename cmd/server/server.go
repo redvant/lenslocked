@@ -26,15 +26,8 @@ type CSRFConfig struct {
 	Secure bool   `env:"CSRF_SECURE" envDefault:"true"`
 }
 type ServerConfig struct {
-	Domain string `env:"SERVER_DOMAIN"`
-	Port   int    `env:"SERVER_PORT" envDefault:"3000"`
-}
-
-func (sc ServerConfig) GetHostAddress() string {
-	if sc.Port == 80 {
-		return sc.Domain
-	}
-	return fmt.Sprintf("%s:%d", sc.Domain, sc.Port)
+	PublicAddress string `env:"SERVER_PUBLIC_ADDRESS,required"`
+	Port          int    `env:"SERVER_PORT" envDefault:"3000"`
 }
 
 func main() {
@@ -94,7 +87,7 @@ func run(cfg config) error {
 		SessionService:       sessionService,
 		PasswordResetService: pwResetService,
 		EmailService:         emailService,
-		HostAddress:          cfg.Server.GetHostAddress(),
+		HostAddress:          cfg.Server.PublicAddress,
 	}
 	usersC.Templates.New = views.Must(views.ParseFS(
 		templates.FS, "tailwind.gohtml", "signup.gohtml",
@@ -191,6 +184,6 @@ func run(cfg config) error {
 	}
 
 	// Start server
-	fmt.Printf("Starting the server on %s:%d...\n", cfg.Server.Domain, cfg.Server.Port)
+	fmt.Printf("Starting the server on :%d...\n", cfg.Server.Port)
 	return server.ListenAndServe()
 }

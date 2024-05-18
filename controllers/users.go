@@ -147,7 +147,7 @@ func (u Users) ProcessForgotPassword(w http.ResponseWriter, r *http.Request) {
 	vals := url.Values{
 		"token": {pwReset.Token},
 	}
-	resetURL := "http://" + u.HostAddress + "/reset-pw?" + vals.Encode()
+	resetURL := u.HostAddress + "/reset-pw?" + vals.Encode()
 	err = u.EmailService.ForgotPassword(data.Email, resetURL)
 	if err != nil {
 		u.Templates.ForgotPassword.Execute(w, r, data, err)

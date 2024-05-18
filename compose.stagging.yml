@@ -18,7 +18,7 @@ services:
       - PSQL_HOST
       - PSQL_PORT
       - PSQL_SSLMODE
-      - SERVER_DOMAIN
+      - SERVER_PUBLIC_ADDRESS
       - SERVER_PORT
       - SMTP_DEFAULT_SENDER
       - SMTP_HOST
