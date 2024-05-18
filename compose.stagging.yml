@@ -31,3 +31,6 @@ services:
     # TODO: Remove before deploying
     ports:
       - 3000:3000
+    depends_on:
+      db:
+        condition: service_healthy
