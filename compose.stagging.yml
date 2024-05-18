@@ -1,0 +1,33 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - CSRF_KEY
+      - CSRF_SECURE
+      - GOOSE_DBSTRING
+      - GOOSE_DRIVER
+      - IMAGES_ALLOWED_EXTENSIONS
+      - IMAGES_ALLOWED_TYPES
+      - IMAGES_DIR
+      - POSTGRES_DB
+      - POSTGRES_PASSWORD
+      - POSTGRES_USER
+      - PSQL_HOST
+      - PSQL_PORT
+      - PSQL_SSLMODE
+      - SERVER_DOMAIN
+      - SERVER_PORT
+      - SMTP_DEFAULT_SENDER
+      - SMTP_HOST
+      - SMTP_PASSWORD
+      - SMTP_PORT
+      - SMTP_USERNAME
+    volumes:
+      - ./images:/app/images
+    # This is for testing purposes
+    # TODO: Remove before deploying
+    ports:
+      - 3000:3000
