@@ -26,7 +26,7 @@ func FAQ(tpl Template) http.HandlerFunc {
 		},
 		{
 			Question: "How do I contact support?",
-			Anwser:   `Email us - <a class="text-indigo-600 hover:text-indigo-800 visited:text-purple-400 underline" href="mailto:support@lenslocked.com">support@lenslocked.com</a>`,
+			Anwser:   `Email us - <a class="text-indigo-600 hover:text-indigo-800 visited:text-purple-400 underline" href="mailto:support@redvant.dev">support@redvant.dev</a>`,
 		},
 		{
 			Question: "Where is your office located?",
