@@ -26,7 +26,7 @@ services:
       - SMTP_PORT
       - SMTP_USERNAME
     volumes:
-      - ./images:/app/images
+      - ${IMAGES_DIR_HOST}:/app/images
     depends_on:
       db:
         condition: service_healthy
@@ -42,3 +42,9 @@ services:
       - 433:433
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
+
+  db:
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ${PSQL_DATA_HOST}:/var/lib/postgresql/data/pgdata
