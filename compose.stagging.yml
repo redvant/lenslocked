@@ -36,6 +36,7 @@ services:
     restart: always
     environment:
       - SERVER_PORT
+      - CADDY_SITE_ADDRESS
     ports:
       - 80:80
       - 433:433
