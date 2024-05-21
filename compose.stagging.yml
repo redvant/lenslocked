@@ -1,5 +1,15 @@
+x-logging:
+  &highlight-logging
+    driver: fluentd
+    options:
+        fluentd-address: "tls://otel.highlight.io:24284"
+        fluentd-async: "true"
+        fluentd-sub-second-precision: "true"
+        tag: "highlight.project_id=${HIGHLIGHT_PROJECT_ID}"
+
 services:
   server:
+    logging: *highlight-logging
     build:
       context: .
       dockerfile: Dockerfile
@@ -32,6 +42,7 @@ services:
         condition: service_healthy
 
   caddy:
+    logging: *highlight-logging
     image: caddy
     restart: always
     environment:
@@ -45,6 +56,7 @@ services:
 
 # db override to keep the db data in the PSQL_DATA_HOST directory
   db:
+    logging: *highlight-logging
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
